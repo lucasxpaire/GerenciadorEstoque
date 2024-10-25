@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.Login">
+   <children>
+      <AnchorPane layoutX="-34.0" layoutY="-19.0" prefHeight="619.0" prefWidth="388.0" style="-fx-background-color: #262626;" />
+
+      <AnchorPane layoutX="353.0" layoutY="-7.0" prefHeight="607.0" prefWidth="697.0">
+         <children>
+            <Label layoutX="296.0" layoutY="102.0" style="-fx-font-size: 36px; -fx-text-fill: #000000;" text="Login" />
+
+            <Label layoutX="197.0" layoutY="199.0" style="-fx-text-fill: #000000;" text="Usuário:" />
+            <TextField fx:id="usuarioTextField" layoutX="193.0" layoutY="229.0" prefWidth="300.0" style="-fx-background-color: #FFFFFF; -fx-text-fill: #000000; -fx-border-color: #000000;" />
+
+            <Label layoutX="199.0" layoutY="285.0" style="-fx-text-fill: #000000;" text="Senha:" />
+            <PasswordField fx:id="senhaPasswordField" layoutX="194.0" layoutY="308.0" prefWidth="300.0" style="-fx-background-color: #FFFFFF; -fx-text-fill: #000000; -fx-border-color: #000000;" />
+
+            <Button fx:id="loginButton" layoutX="236.0" layoutY="414.0" prefWidth="200.0" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF;" text="Entrar" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
