@@ -31,8 +31,6 @@ public class SistemaGerenciaBD {
             System.out.println(e.getMessage());
         }
     }
-
-    // Método para buscar um usuário
     public void buscarUsuario(String nome) {
         String sql = "SELECT * FROM usuarios WHERE nome = ?";
 

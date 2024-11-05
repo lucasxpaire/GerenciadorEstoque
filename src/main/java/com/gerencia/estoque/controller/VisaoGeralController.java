@@ -54,4 +54,5 @@ public class VisaoGeralController {
         labelTotalVendas.setText("Total de Vendas: R$ 5.000,00");
         labelTotalCompras.setText("Total de Compras: R$ 3.000,00");
     }
+
 }
