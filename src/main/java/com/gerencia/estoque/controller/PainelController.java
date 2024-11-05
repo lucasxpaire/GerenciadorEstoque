@@ -69,5 +69,4 @@ public class PainelController {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
-
 }

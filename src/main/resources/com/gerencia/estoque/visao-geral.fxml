@@ -39,3 +39,4 @@
         <Label fx:id="labelTotalCompras" layoutX="300.0" layoutY="300.0" style="-fx-font-size: 14px;" text="Total de Compras: R$ 0,00"/>
     </children>
 </AnchorPane>
+

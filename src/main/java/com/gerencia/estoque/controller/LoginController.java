@@ -89,5 +89,4 @@ public class LoginController {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
-
 }
