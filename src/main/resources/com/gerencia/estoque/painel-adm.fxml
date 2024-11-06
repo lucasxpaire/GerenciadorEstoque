@@ -4,15 +4,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.gerencia.estoque.controller.PainelController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.PainelController">
     <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Painel de Controle do Proprietário" />
 
     <Button onAction="#goToVisaoGeral" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Visão Geral" />
-    <Button onAction="#goToCadastroProdutos" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Cadastro de Produtos" />
-    <Button onAction="#goToMovimentacoesEstoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Movimentações de Estoque" />
-    <Button onAction="#goToRelatorios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Relatórios Detalhados" />
-    <Button onAction="#goToConfiguracoesUsuarios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Configurações de Usuários" />
+    <Button onAction="#goToManterEstoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Manter Estoque" />
+    <Button onAction="#goToRelatorios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Relatórios" />
+    <Button onAction="#goToConfiguracoesUsuarios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Manter Funcionário" />
 
     <Button onAction="#voltar" text="Desconectar" />
 </VBox>
-

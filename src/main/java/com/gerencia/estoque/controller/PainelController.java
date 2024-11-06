@@ -21,16 +21,6 @@ public class PainelController {
     }
 
     @FXML
-    public void goToCadastroProdutos(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/cadastro-produtos.fxml", "Cadastro de Produtos", event);
-    }
-
-    @FXML
-    public void goToMovimentacoesEstoque(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/movimentacoes-estoque.fxml", "Movimentações de Estoque", event);
-    }
-
-    @FXML
     public void goToRelatorios(ActionEvent event) {
         carregarTela("/com/gerencia/estoque/relatorios.fxml", "Relatórios Detalhados", event);
     }
@@ -45,6 +35,11 @@ public class PainelController {
         carregarTela("/com/gerencia/estoque/login.fxml", "Login", event);
     }
 
+    @FXML
+    public void goToManterEstoque(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/manter-estoque.fxml", "Manter Estoque", event);
+    }
+
     // Método para carregar a tela específica
     private void carregarTela(String caminhoFXML, String titulo, ActionEvent event) {
         try {
@@ -55,6 +50,7 @@ public class PainelController {
             stage.setScene(scene);
             stage.setTitle(titulo);
             stage.setFullScreen(true);
+            stage.setFullScreenExitHint("");
             stage.show();
         } catch (IOException e) {
             mostrarAlerta("Erro", "Falha ao carregar a tela: " + e.getMessage());

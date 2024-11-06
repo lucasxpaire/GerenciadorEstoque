@@ -75,6 +75,7 @@ public class LoginController {
             stage.setScene(scene);
             stage.setTitle(titulo);
             stage.setFullScreen(true); // Maximiza a janela se solicitado
+            stage.setFullScreenExitHint("");
             stage.show();
         } catch (IOException e) {
             mostrarAlerta("Erro", "Falha ao carregar a tela: " + e.getMessage());
