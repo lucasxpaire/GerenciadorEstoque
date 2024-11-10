@@ -1,6 +1,7 @@
 module com.gerencia.estoque {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics; // Para incluir gráficos do JavaFX
     requires java.sql;
 
 

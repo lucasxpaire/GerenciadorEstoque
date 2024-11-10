@@ -16,7 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CadastroProdutoController {
+public class ComprarItemController {
 
     @FXML
     private TextField nomeProduto;
@@ -31,7 +31,7 @@ public class CadastroProdutoController {
     private TextField quantidadeProduto;
 
     @FXML
-    public void cadastrarProduto(ActionEvent event) {
+    public void comprarItem(ActionEvent event) {
         String nome = nomeProduto.getText();
         String categoria = categoriaProduto.getText();
         String precoStr = precoProduto.getText();
@@ -55,28 +55,31 @@ public class CadastroProdutoController {
             return;
         }
 
-        // Inserir no banco de dados
-        String sql = "INSERT INTO produtos (nome, categoria, preco, quantidade) VALUES (?, ?, ?, ?)";
+        // Inserir na tabela itens_comprados
+        String sqlCompra = "INSERT INTO itens_comprados (nome_produto, categoria_produto, preco_produto, quantidade_comprada) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
 
-            stmt.setString(1, nome);
-            stmt.setString(2, categoria);
-            stmt.setDouble(3, preco);
-            stmt.setInt(4, quantidade);
+            // Inserir o item comprado na tabela itens_comprados
+            try (PreparedStatement stmtCompra = conn.prepareStatement(sqlCompra)) {
+                stmtCompra.setString(1, nome);
+                stmtCompra.setString(2, categoria);
+                stmtCompra.setDouble(3, preco);
+                stmtCompra.setInt(4, quantidade);
 
-            int rowsAffected = stmt.executeUpdate();
+                int rowsAffectedCompra = stmtCompra.executeUpdate();
 
-            if (rowsAffected > 0) {
-                showAlert("Sucesso", "Produto cadastrado com sucesso.");
-                limparCampos();
-            } else {
-                showAlert("Erro", "Falha ao cadastrar o produto.");
+                if (rowsAffectedCompra > 0) {
+                    showAlert("Sucesso", "Compra registrada com sucesso.");
+                    limparCampos();
+                } else {
+                    showAlert("Erro", "Falha ao registrar a compra.");
+                }
             }
 
         } catch (SQLException e) {
             showAlert("Erro", "Erro ao acessar o banco de dados: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -95,15 +98,6 @@ public class CadastroProdutoController {
         quantidadeProduto.clear();
     }
 
-    // Método para mostrar alertas
-    private void mostrarAlerta(String titulo, String mensagem) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
-    }
-    // Método para voltar ao painel de administração
     @FXML
     public void voltarPainelAdm(ActionEvent event) {
         carregarTela("/com/gerencia/estoque/manter-estoque.fxml", "Painel do Administrador", event);
@@ -121,8 +115,7 @@ public class CadastroProdutoController {
             stage.setFullScreenExitHint("");
             stage.show();
         } catch (IOException e) {
-            mostrarAlerta("Erro", "Falha ao carregar a tela: " + e.getMessage());
+            showAlert("Erro", "Falha ao carregar a tela: " + e.getMessage());
         }
     }
 }
-

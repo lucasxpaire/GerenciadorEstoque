@@ -13,23 +13,27 @@ import java.io.IOException;
 public class ManterEstoqueController {
 
     @FXML
-    public void goToCadastrarProduto(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/cadastro-produtos.fxml", "Cadastrar Produto", event);
+    public void goToComprarItem(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/comprar-item.fxml", "Comprar Item", event);
     }
 
     @FXML
-    public void goToEditarProduto(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/editar-produtos.fxml", "Editar Produto", event);
+    public void goToAlterarItem(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/alterar-item.fxml", "Alterar Item", event);
     }
 
     @FXML
-    public void goToRemoverProduto(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/remover-produtos.fxml", "Remover Produto", event);
+    public void goToAdicionarItemEstoque(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/adicionar-item-estoque.fxml", "Adicionar Item ao Estoque", event);
     }
 
     @FXML
-    public void goToVisualizarEstoque(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/visualizar-estoque.fxml", "Visualizar Estoque", event);
+    public void goToRemoverItemEstoque(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/remover-item-estoque.fxml", "Remover Item do Estoque", event);
+    }
+
+    public void gotToVisualizarEstoque(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/visualizar-estoque.fxml", "Visualizar itens do Estoque", event);
     }
 
     @FXML
