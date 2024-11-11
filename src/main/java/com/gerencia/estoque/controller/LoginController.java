@@ -53,7 +53,7 @@ public class LoginController {
     // Método para verificar o login no banco de dados
     private boolean verificarLogin(String usuario, String senha) {
         try (Connection connection = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM usuarios WHERE usuario = ? AND senha = ?";
+            String query = "SELECT * FROM credencial WHERE usuario = ? AND senha = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, usuario);
             preparedStatement.setString(2, senha);

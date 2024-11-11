@@ -26,8 +26,8 @@ public class PainelController {
     }
 
     @FXML
-    public void goToConfiguracoesUsuarios(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/configuracoes-usuarios.fxml", "Configurações de Usuários", event);
+    public void goToManterFuncionarios(ActionEvent event) {
+        carregarTela("/com/gerencia/estoque/manter-funcionarios.fxml", "Configuração de Funcionários", event);
     }
 
     @FXML
