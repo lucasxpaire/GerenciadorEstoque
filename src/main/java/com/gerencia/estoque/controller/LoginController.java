@@ -40,7 +40,7 @@ public class LoginController {
         } else if (verificarLogin(usuario, senha)) {
             // Se o usuário contém 'adm', redireciona para a tela de Proprietário
             if (usuario.contains("adm")) {
-                carregarTela("/com/gerencia/estoque/painel-adm.fxml", "Visão Geral do Dono");
+                carregarTela("/com/gerencia/estoque/painel-adm/painel-adm.fxml", "Visão Geral do Dono");
             } else {
                 // Senão, redireciona para a tela de Funcionário
                 carregarTela("/com/gerencia/estoque/funcionario-view.fxml", "Tela do Funcionário");
@@ -74,7 +74,7 @@ public class LoginController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle(titulo);
-            stage.setFullScreen(true); // Maximiza a janela se solicitado
+            stage.setFullScreen(true);
             stage.setFullScreenExitHint("");
             stage.show();
         } catch (IOException e) {

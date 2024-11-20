@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.AlterarItemController">
+    <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Alterar Item" />
+
+    <Label text="Selecione o Item:" />
+    <ComboBox fx:id="comboBoxItens" minWidth="300.0" prefWidth="300.0" maxWidth="300.0" onAction="#exibirDetalhesItem" />
+
+    <VBox spacing="10" alignment="CENTER">
+        <Label text="Nome do Produto:" />
+        <TextField fx:id="nomeProduto" minWidth="200.0" prefWidth="200.0" maxWidth="300.0" promptText="Digite o nome do produto" />
+
+        <Label text="Preço:" />
+        <TextField fx:id="precoProduto" minWidth="200.0" prefWidth="200.0" maxWidth="300.0" promptText="Digite o preço" />
+    </VBox>
+
+    <Button text="Alterar Item" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#alterarProduto" />
+    <Button text="Excluir Item" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: #FF0000; -fx-text-fill: #FFFFFF;" onAction="#excluirProduto" />
+    <Button onAction="#voltar" text="Voltar" />
+</VBox>

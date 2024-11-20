@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.ManterEstoqueController">
+    <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Gerenciar Estoque" />
+
+    <Button text="Comprar Item" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#goToComprarItem" />
+    <Button text="Alterar Item" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#goToAlterarItem" />
+    <Button text="Adicionar Item ao Estoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#goToAdicionarItemEstoque" />
+    <Button text="Remover Item do Estoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#goToRemoverItemEstoque" />
+    <Button text="Visualizar Itens do Estoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#gotToVisualizarEstoque" />
+
+    <Button onAction="#voltar" text="Voltar" />
+</VBox>

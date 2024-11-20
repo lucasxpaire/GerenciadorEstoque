@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.paineladm.VisaoGeralController">
+
+    <!-- Título -->
+    <Text style="-fx-font-size: 24px; -fx-fill: #262626;" text="Visão Geral do Negócio" />
+
+    <!-- Seção de gráficos com VBox -->
+    <HBox spacing="20" alignment="CENTER">
+        <!-- Gráfico de Pizza para estoque -->
+        <VBox alignment="CENTER">
+            <Text style="-fx-font-size: 18px; -fx-fill: #262626;" text="Quantidade de Itens no Estoque" />
+            <PieChart fx:id="estoquePieChart" prefHeight="300.0" prefWidth="300.0" />
+        </VBox>
+
+        <!-- Gráfico de Barras para movimentação -->
+        <VBox alignment="CENTER">
+            <Text style="-fx-font-size: 18px; -fx-fill: #262626;" text="Produtos com Maior Movimentação" />
+            <BarChart fx:id="movimentacaoBarChart" prefHeight="300.0" prefWidth="300.0">
+                <xAxis>
+                    <CategoryAxis label="Produto" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Quantidade" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </HBox>
+
+    <!-- Gráfico de Linhas para vendas semanais -->
+    <VBox alignment="CENTER">
+        <Text style="-fx-font-size: 18px; -fx-fill: #262626;" text="Vendas Semanais do Produto Mais Vendido" />
+        <LineChart fx:id="vendasSemanaisLineChart" prefHeight="300.0" prefWidth="700.0">
+            <xAxis>
+                <CategoryAxis label="Dia da Semana" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Quantidade Vendida" />
+            </yAxis>
+        </LineChart>
+    </VBox>
+
+    <!-- Informações gerais -->
+    <Text fx:id="totalVendasText" style="-fx-font-size: 18px; -fx-fill: #262626;" text="Total de Vendas: R$ 0.00"/>
+
+    <!-- Botão "Voltar" seguindo o estilo do painel-adm -->
+    <Button onAction="#voltar" text="Voltar" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+</VBox>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.vender.VenderController" style="-fx-padding: 20;">
+
+    <!-- Título da tela -->
+    <Label text="Venda de Produtos" style="-fx-font-size: 24px; -fx-text-fill: #000000;" />
+
+    <!-- ComboBox para selecionar Cliente -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Selecionar Cliente:" />
+        <ComboBox fx:id="comboClientes" promptText="Selecione um cliente" style="-fx-pref-width: 300;" />
+    </HBox>
+
+    <!-- Tabela de Produtos em estoque -->
+    <TableView fx:id="tableProdutos" prefHeight="200" style="-fx-background-color: #f0f0f0;">
+        <columns>
+            <TableColumn fx:id="colunaNomeProduto" text="Produto" prefWidth="200" />
+            <TableColumn fx:id="colunaPreco" text="Preço" prefWidth="100" />
+            <TableColumn fx:id="colunaQuantidadeEstoque" text="Estoque" prefWidth="100" />
+        </columns>
+    </TableView>
+
+    <!-- Detalhes do produto selecionado -->
+    <VBox spacing="10" style="-fx-padding: 0 50 0 50;">
+        <TextField fx:id="campoProdutoSelecionado" promptText="Produto Selecionado" editable="false" />
+        <TextField fx:id="campoPreco" promptText="Preço" editable="false" />
+        <TextField fx:id="campoQuantidadeEstoque" promptText="Estoque Disponível" editable="false" />
+        <TextField fx:id="campoQuantidadeVenda" promptText="Quantidade para Venda" />
+    </VBox>
+
+    <!-- Botões de ações -->
+    <HBox alignment="CENTER" spacing="10">
+        <Button text="Finalizar Venda" onAction="#finalizarVenda" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+        <Button text="Aplicar Desconto" onAction="#aplicarDesconto" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+        <Button text="Verificar Fidelidade" onAction="#verificarFidelidade" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+        <Button text="Voltar" onAction="#voltar" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+    </HBox>
+</VBox>

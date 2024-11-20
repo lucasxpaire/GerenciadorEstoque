@@ -10,7 +10,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/login.fxml")); // Caminho do arquivo FXML
+            Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/login/login.fxml"));
             primaryStage.setTitle("Login");
             primaryStage.setScene(new Scene(root));
             primaryStage.setFullScreen(true);
