@@ -1,6 +1,7 @@
 package com.gerencia.estoque.controller.funcionarios;
 
 import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.model.funcionarios.Funcionario;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

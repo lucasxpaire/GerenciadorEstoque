@@ -1,4 +1,4 @@
-package com.gerencia.estoque.controller.estoque;
+package com.gerencia.estoque.model.estoque;
 
 public class ItemComprado {
 

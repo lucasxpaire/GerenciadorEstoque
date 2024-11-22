@@ -1,4 +1,4 @@
-package com.gerencia.estoque.controller.funcionarios;
+package com.gerencia.estoque.model.funcionarios;
 
 public class Credencial {
 

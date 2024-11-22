@@ -1,4 +1,4 @@
-package com.gerencia.estoque.controller.relatorio;
+package com.gerencia.estoque.model.relatorio;
 
 public class Movimentacao {
     private String dataMovimento;

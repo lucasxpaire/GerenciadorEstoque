@@ -1,6 +1,7 @@
 package com.gerencia.estoque.controller.estoque;
 
 import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.model.estoque.ItemEstoque;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

@@ -1,5 +1,6 @@
 package com.gerencia.estoque.controller.relatorio;
 
+import com.gerencia.estoque.model.relatorio.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
