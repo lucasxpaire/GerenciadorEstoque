@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller.funcionarios;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.funcionarios.Funcionario;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -69,7 +69,7 @@ public class ManterFuncionariosController {
     private String getCredencialTipo(int idCredencial) {
         String tipo = "";
         String sql = "SELECT tipo FROM credencial WHERE idCredencial = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
             ResultSet rs = stmt.executeQuery();
@@ -86,7 +86,7 @@ public class ManterFuncionariosController {
     private String getCredencialUsuario(int idCredencial) {
         String usuario = "";
         String sql = "SELECT usuario FROM credencial WHERE idCredencial = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
             ResultSet rs = stmt.executeQuery();
@@ -103,7 +103,7 @@ public class ManterFuncionariosController {
     private String getCredencialSenha(int idCredencial) {
         String senha = "";
         String sql = "SELECT senha FROM credencial WHERE idCredencial = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
             ResultSet rs = stmt.executeQuery();
@@ -119,7 +119,7 @@ public class ManterFuncionariosController {
     private void carregarFuncionarios() {
         listaFuncionarios.clear();
         String sql = "SELECT f.idFuncionario, f.nome, f.idCredencial FROM funcionario f";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -150,7 +150,7 @@ public class ManterFuncionariosController {
         String sqlCredencial = "INSERT INTO credencial (usuario, senha, tipo) VALUES (?, ?, ?)";
         String sqlFuncionario = "INSERT INTO funcionario (idCredencial, nome) VALUES (?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (Connection conn = Database.getConnection()) {
             conn.setAutoCommit(false); // Inicia uma transação
 
             // Inserir na tabela credencial
@@ -221,7 +221,7 @@ public class ManterFuncionariosController {
             String sqlFuncionario = "DELETE FROM funcionario WHERE idFuncionario = ?";
             String sqlCredencial = "DELETE FROM credencial WHERE idCredencial = ?";
 
-            try (Connection conn = DatabaseConnection.getConnection()) {
+            try (Connection conn = Database.getConnection()) {
                 conn.setAutoCommit(false); // Inicia a transação
 
                 // Remove o funcionário
@@ -251,7 +251,7 @@ public class ManterFuncionariosController {
 
     private void atualizarCredencial(int idCredencial, String usuario, String senha) {
         String sql = "UPDATE credencial SET usuario = ?, senha = ? WHERE idCredencial = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usuario);
             stmt.setString(2, senha);
@@ -264,7 +264,7 @@ public class ManterFuncionariosController {
 
     private void atualizarFuncionario(Funcionario funcionario) {
         String sql = "UPDATE funcionario SET nome = ? WHERE idFuncionario = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, funcionario.getNome());
             stmt.setInt(2, funcionario.getIdFuncionario());

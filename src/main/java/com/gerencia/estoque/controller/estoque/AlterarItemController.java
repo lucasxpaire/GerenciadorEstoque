@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller.estoque;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.estoque.ItemComprado;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,7 +44,7 @@ public class AlterarItemController {
     private void carregarItensComprados() {
         String sql = "SELECT * FROM itens_comprados";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -135,7 +135,7 @@ public class AlterarItemController {
 
         String sql = "UPDATE itens_comprados SET nome_produto = ?, preco_produto = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, nome);
@@ -169,7 +169,7 @@ public class AlterarItemController {
 
         String sql = "DELETE FROM itens_comprados WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, selectedItem.getId());

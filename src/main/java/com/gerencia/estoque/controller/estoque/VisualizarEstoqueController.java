@@ -1,7 +1,7 @@
 package com.gerencia.estoque.controller.estoque;
 
 import com.gerencia.estoque.model.estoque.ItemEstoque;
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -132,7 +132,7 @@ public class VisualizarEstoqueController {
         // Incluindo a coluna 'id' na consulta
         String sql = "SELECT id, nome_produto, categoria_produto, preco_produto, quantidade FROM estoque";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 

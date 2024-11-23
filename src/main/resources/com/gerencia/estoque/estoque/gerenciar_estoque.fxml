@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="gerenciarEstoquePane" alignment="CENTER" spacing="20"
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gerencia.estoque.controller.estoque.GerenciarEstoqueController">
+
+    <TableView fx:id="tabelaEstoque">
+        <columns>
+            <TableColumn fx:id="colunaDescricao" text="Descrição" />
+            <TableColumn fx:id="colunaPreco" text="Preço" />
+            <TableColumn fx:id="colunaQuantidade" text="Quantidade" />
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" spacing="15">
+        <Button onAction="#abrirJanelaSelecionarProduto" text="Adicionar Produto" />
+        <Button onAction="#editarProduto" text="Editar Produto" />
+        <Button onAction="#removerProduto" text="Remover Produto" />
+    </HBox>
+
+</VBox>

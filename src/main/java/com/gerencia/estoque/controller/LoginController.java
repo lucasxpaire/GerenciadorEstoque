@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -39,7 +39,7 @@ public class LoginController {
             mostrarAlerta("Erro", "Por favor, preencha todos os campos.");
         } else if (verificarLogin(usuario, senha)) {
             // Se o usuário contém 'adm', redireciona para a tela de Proprietário
-            if (usuario.contains("adm")) {
+            if (usuario.contains("prop")) {
                 carregarTela("/com/gerencia/estoque/painel-adm/painel-adm.fxml", "Visão Geral do Dono");
             } else {
                 // Senão, redireciona para a tela de Funcionário
@@ -52,8 +52,8 @@ public class LoginController {
 
     // Método para verificar o login no banco de dados
     private boolean verificarLogin(String usuario, String senha) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM credencial WHERE usuario = ? AND senha = ?";
+        try (Connection connection = Database.getConnection()) {
+            String query = "SELECT * FROM credenciais WHERE usuario = ? AND senha = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, usuario);
             preparedStatement.setString(2, senha);

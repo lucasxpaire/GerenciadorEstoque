@@ -14,7 +14,7 @@ public class ManterEstoqueController {
 
     @FXML
     public void goToComprarItem(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/estoque/comprar-item.fxml", "Comprar Item", event);
+        carregarTela("/com/gerencia/estoque/estoque/comprar-produto.fxml", "Comprar Item", event);
     }
 
     @FXML

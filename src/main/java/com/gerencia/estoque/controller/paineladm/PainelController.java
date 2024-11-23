@@ -28,7 +28,7 @@ public class PainelController {
     }
     @FXML
     public void goToManterEstoque(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/estoque/manter-estoque.fxml", "Manter Estoque", event);
+        carregarTela("/com/gerencia/estoque/estoque/estoque.fxml", "Estoque", event);
     }
     @FXML
     public void goToVender(ActionEvent event) {

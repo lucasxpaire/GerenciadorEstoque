@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller.estoque;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.estoque.ItemComprado;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,7 +45,7 @@ public class AdicionarItemEstoqueController {
     private void carregarItensComprados() {
         String sql = "SELECT * FROM itens_comprados";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -149,7 +149,7 @@ public class AdicionarItemEstoqueController {
         String sqlInserirEstoque = "INSERT INTO estoque (nome_produto, categoria_produto, preco_produto, quantidade) VALUES (?, ?, ?, ?)";
         String sqlDecrementarComprado = "UPDATE itens_comprados SET quantidade_comprada = quantidade_comprada - ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmtInserirEstoque = conn.prepareStatement(sqlInserirEstoque);
              PreparedStatement stmtDecrementarComprado = conn.prepareStatement(sqlDecrementarComprado)) {
 

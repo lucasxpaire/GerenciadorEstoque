@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.ComprarItemController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="-20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.ComprarProdutoControllerAntigo">
     <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Comprar Item" />
 
     <VBox spacing="10" alignment="CENTER">
@@ -22,6 +22,8 @@
         <TextField fx:id="quantidadeProduto" minWidth="200.0" prefWidth="200.0" maxWidth="300.0" promptText="Digite a quantidade" />
     </VBox>
 
-    <Button text="Comprar" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#comprarItem" />
-    <Button onAction="#voltarPainelAdm" text="Voltar" />
+    <Button text="Comprar" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" onAction="#comprarProduto" />
+
+    <!-- Botão Voltar com margem -->
+    <Button onAction="#voltarPainelAdm" text="Voltar" VBox.margin="20" />
 </VBox>

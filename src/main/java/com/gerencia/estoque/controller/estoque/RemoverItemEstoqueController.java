@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller.estoque;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.estoque.ItemEstoque;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,7 +52,7 @@ public class RemoverItemEstoqueController {
     private void carregarItensEstoque() {
         String sql = "SELECT * FROM estoque";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -142,7 +142,7 @@ public class RemoverItemEstoqueController {
             sql = "UPDATE estoque SET quantidade = ? WHERE id = ?";
         }
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             if (novaQuantidade == 0) {

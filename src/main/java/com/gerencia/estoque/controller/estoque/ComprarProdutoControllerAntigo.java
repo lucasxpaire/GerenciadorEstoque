@@ -1,6 +1,6 @@
 package com.gerencia.estoque.controller.estoque;
 
-import com.gerencia.estoque.dao.DatabaseConnection;
+import com.gerencia.estoque.dao.Database;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class ComprarItemController {
+public class ComprarProdutoControllerAntigo {
 
     @FXML
     private TextField nomeProduto;
@@ -31,7 +31,7 @@ public class ComprarItemController {
     private TextField quantidadeProduto;
 
     @FXML
-    public void comprarItem(ActionEvent event) {
+    public void comprarProduto(ActionEvent event) {
         String nome = nomeProduto.getText();
         String categoria = categoriaProduto.getText();
         String precoStr = precoProduto.getText();
@@ -58,7 +58,7 @@ public class ComprarItemController {
         // Inserir na tabela itens_comprados
         String sqlCompra = "INSERT INTO itens_comprados (nome_produto, categoria_produto, preco_produto, quantidade_comprada) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (Connection conn = Database.getConnection()) {
 
             // Inserir o item comprado na tabela itens_comprados
             try (PreparedStatement stmtCompra = conn.prepareStatement(sqlCompra)) {
