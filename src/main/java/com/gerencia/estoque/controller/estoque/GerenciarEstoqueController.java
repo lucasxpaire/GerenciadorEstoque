@@ -7,6 +7,7 @@ import com.gerencia.estoque.model.estoque.Produto;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
@@ -74,6 +75,7 @@ public class GerenciarEstoqueController {
             e.printStackTrace();
         }
     }
+
     private void carregarProdutos() {
         String sql = "SELECT * FROM estoque";
         try (Connection connection = Database.getConnection(); Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
@@ -93,6 +95,7 @@ public class GerenciarEstoqueController {
 
     @FXML
     private void abrirJanelaSelecionarProduto() {
+        // Criar a nova janela de seleção de produto
         Stage janelaSelecaoProduto = new Stage();
         janelaSelecaoProduto.setTitle("Selecionar Produto");
 
@@ -105,13 +108,14 @@ public class GerenciarEstoqueController {
         colunaPrecoCompra.setCellValueFactory(dados -> dados.getValue().precoProperty().asObject());
 
         tabelaProdutosCompra.getColumns().addAll(colunaDescricaoCompra, colunaPrecoCompra);
-        carregarProdutosCompra(); // Carregar os produtos da tabela compraprodutos
+
+        // Carregar os produtos da tabela "compraprodutos"
+        carregarProdutosCompra(); // Método que preenche a lista listaProdutosCompra
         tabelaProdutosCompra.setItems(listaProdutosCompra);
 
-        // Definir ação quando um produto for selecionado
+        // Ação ao selecionar um produto
         tabelaProdutosCompra.getSelectionModel().selectedItemProperty().addListener((obs, antigo, selecionado) -> {
             if (selecionado != null) {
-                // Passar os dados selecionados para os campos
                 campoDescricao.setText(selecionado.getDescricao());
                 campoPreco.setText(String.valueOf(selecionado.getPreco()));
 
@@ -120,13 +124,75 @@ public class GerenciarEstoqueController {
             }
         });
 
-        // Exibir a janela
-        Scene cena = new Scene(tabelaProdutosCompra);
+        // Criar um botão para adicionar um novo produto
+        Button btnAdicionarProduto = new Button("Adicionar Produto");
+        btnAdicionarProduto.setOnAction(e -> abrirJanelaAdicionarProduto());
+
+        // Layout para organizar a tabela e o botão
+        VBox vbox = new VBox(tabelaProdutosCompra, btnAdicionarProduto);
+        Scene cena = new Scene(vbox);
         janelaSelecaoProduto.setScene(cena);
-        janelaSelecaoProduto.initModality(Modality.APPLICATION_MODAL);
-        janelaSelecaoProduto.showAndWait();
+
+        // Configurar a janela para sempre aparecer acima da janela principal
+        Stage stageAtual = (Stage) tabelaEstoque.getScene().getWindow();
+        janelaSelecaoProduto.initOwner(stageAtual); // A janela selecionada será dona da nova janela
+        janelaSelecaoProduto.initModality(Modality.APPLICATION_MODAL); // Modal, impede interações com outras janelas
+        janelaSelecaoProduto.show();
     }
 
+    private void abrirJanelaAdicionarProduto() {
+        // Criar a nova janela de adicionar produto
+        Stage janelaAdicionarProduto = new Stage();
+        janelaAdicionarProduto.setTitle("Adicionar Produto");
+
+        // Campos de entrada para o novo produto
+        TextField campoDescricaoNovoProduto = new TextField();
+        campoDescricaoNovoProduto.setPromptText("Descrição");
+
+        TextField campoPrecoNovoProduto = new TextField();
+        campoPrecoNovoProduto.setPromptText("Preço");
+
+        TextField campoQuantidadeNovoProduto = new TextField();
+        campoQuantidadeNovoProduto.setPromptText("Quantidade");
+
+        // Botão para adicionar o produto ao estoque
+        Button btnAdicionarNovoProduto = new Button("Adicionar");
+        btnAdicionarNovoProduto.setOnAction(e -> {
+            String descricao = campoDescricaoNovoProduto.getText();
+            double preco = Double.parseDouble(campoPrecoNovoProduto.getText());
+            int quantidade = Integer.parseInt(campoQuantidadeNovoProduto.getText());
+
+            // Adicionar o produto no banco de dados
+            adicionarProdutoAoEstoque(descricao, preco, quantidade);
+
+            // Fechar a janela após adicionar
+            janelaAdicionarProduto.close();
+        });
+
+        // Layout da janela de adicionar produto
+        VBox vboxAdicionarProduto = new VBox(campoDescricaoNovoProduto, campoPrecoNovoProduto, campoQuantidadeNovoProduto, btnAdicionarNovoProduto);
+        Scene cenaAdicionarProduto = new Scene(vboxAdicionarProduto);
+        janelaAdicionarProduto.setScene(cenaAdicionarProduto);
+
+        // Exibir a janela de adicionar produto
+        janelaAdicionarProduto.initModality(Modality.APPLICATION_MODAL);
+        janelaAdicionarProduto.show();
+    }
+
+    private void adicionarProdutoAoEstoque(String descricao, double preco, int quantidade) {
+        String sql = "INSERT INTO estoque (descricao, preco, quantidade) VALUES (?, ?, ?)";
+        try (Connection connection = Database.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, descricao);
+            ps.setDouble(2, preco);
+            ps.setInt(3, quantidade);
+            ps.executeUpdate();
+            exibirAlerta("Produto adicionado com sucesso!");
+            recarregarProdutos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exibirAlerta("Erro ao adicionar produto.");
+        }
+    }
 
     @FXML
     private void adicionarProduto() {
@@ -177,7 +243,6 @@ public class GerenciarEstoqueController {
         }
     }
 
-
     @FXML
     private void removerProduto() {
         EstoqueProduto produtoSelecionado = tabelaEstoque.getSelectionModel().getSelectedItem();
@@ -199,28 +264,16 @@ public class GerenciarEstoqueController {
         }
     }
 
-
     private void recarregarProdutos() {
         listaProdutos.clear();
         carregarProdutos();
     }
 
     private void exibirAlerta(String mensagem) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Informação");
-        alerta.setHeaderText(null);
-        alerta.setContentText(mensagem);
-
-        Stage stage = (Stage) tabelaEstoque.getScene().getWindow();
-        alerta.initOwner(stage);
-        alerta.initModality(Modality.APPLICATION_MODAL);
-
-        alerta.showAndWait();
-    }
-
-    @FXML
-    private void fecharJanela() {
-        Stage stage = (Stage) tabelaEstoque.getScene().getWindow();
-        stage.close();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Informação");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
     }
 }

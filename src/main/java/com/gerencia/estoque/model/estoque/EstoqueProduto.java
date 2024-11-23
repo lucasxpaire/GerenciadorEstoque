@@ -1,7 +1,6 @@
 package com.gerencia.estoque.model.estoque;
 
 import javafx.beans.property.*;
-
 public class EstoqueProduto {
     private final IntegerProperty idProd;
     private final StringProperty descricao;

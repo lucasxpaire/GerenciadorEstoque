@@ -40,7 +40,7 @@ public class EstoqueController {
 
             Stage stage = new Stage();
             stage.setTitle(titulo);
-            stage.initModality(Modality.APPLICATION_MODAL);
+            //stage.initModality(Modality.APPLICATION_MODAL);
             //stage.initModality(Modality.NONE);
 
             if(estoquePane != null && estoquePane.getScene() != null){
