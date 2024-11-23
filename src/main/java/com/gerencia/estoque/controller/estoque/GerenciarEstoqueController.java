@@ -1,18 +1,23 @@
 package com.gerencia.estoque.controller.estoque;
 
 import com.gerencia.estoque.dao.Database;
+import com.gerencia.estoque.model.estoque.CompraProduto;
 import com.gerencia.estoque.model.estoque.EstoqueProduto;
 import com.gerencia.estoque.model.estoque.Produto;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
+import java.io.IOException;
 import java.sql.*;
 
 public class GerenciarEstoqueController {
@@ -29,249 +34,221 @@ public class GerenciarEstoqueController {
     @FXML
     private TableColumn<EstoqueProduto, Integer> colunaQuantidade;
 
-    @FXML
-    private TextField campoDescricao;
-
-    @FXML
-    private TextField campoPreco;
-
-    @FXML
-    private TextField campoQuantidade;
-
-    private ObservableList<EstoqueProduto> listaProdutos = FXCollections.observableArrayList();
-    private ObservableList<Produto> listaProdutosCompra = FXCollections.observableArrayList();
+    private ObservableList<EstoqueProduto> listaProdutosEstoque = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         configurarTabela();
-        carregarProdutos();
+        carregarProdutosEstoque();
     }
 
     private void configurarTabela() {
         colunaDescricao.setCellValueFactory(dados -> dados.getValue().descricaoProperty());
         colunaPreco.setCellValueFactory(dados -> dados.getValue().precoProperty().asObject());
         colunaQuantidade.setCellValueFactory(dados -> dados.getValue().quantidadeProperty().asObject());
-
-        tabelaEstoque.getSelectionModel().selectedItemProperty().addListener((obs, antigo, selecionado) -> {
-            if (selecionado != null) {
-                campoDescricao.setText(selecionado.getDescricao());
-                campoPreco.setText(String.valueOf(selecionado.getPreco()));
-                campoQuantidade.setText(String.valueOf(selecionado.getQuantidade()));
-            }
-        });
     }
 
-    private void carregarProdutosCompra() {
-        String sql = "SELECT * FROM compraprodutos";
-        try (Connection connection = Database.getConnection(); Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+    private void carregarProdutosEstoque() {
+        listaProdutosEstoque.clear();
+        String sql = "SELECT * FROM Estoque";
+        try (Connection connection = Database.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                listaProdutosCompra.add(new Produto(
-                        rs.getInt("idprod"),
-                        rs.getString("descricao"),
-                        rs.getDouble("preco")
+                listaProdutosEstoque.add(new EstoqueProduto(
+                        rs.getInt("IdProd"),
+                        rs.getString("Descricao"),
+                        rs.getDouble("Preco"),
+                        rs.getInt("Quantidade")
                 ));
             }
+            tabelaEstoque.setItems(listaProdutosEstoque);
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void carregarProdutos() {
-        String sql = "SELECT * FROM estoque";
-        try (Connection connection = Database.getConnection(); Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                listaProdutos.add(new EstoqueProduto(
-                        rs.getInt("idprod"),
-                        rs.getString("descricao"),
-                        rs.getDouble("preco"),
-                        rs.getInt("quantidade")
-                ));
-            }
-            tabelaEstoque.setItems(listaProdutos);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void abrirJanelaSelecionarProduto() {
-        // Criar a nova janela de seleção de produto
-        Stage janelaSelecaoProduto = new Stage();
-        janelaSelecaoProduto.setTitle("Selecionar Produto");
-
-        // Criar uma tabela para mostrar os produtos
-        TableView<Produto> tabelaProdutosCompra = new TableView<>();
-        TableColumn<Produto, String> colunaDescricaoCompra = new TableColumn<>("Descrição");
-        colunaDescricaoCompra.setCellValueFactory(dados -> dados.getValue().descricaoProperty());
-
-        TableColumn<Produto, Double> colunaPrecoCompra = new TableColumn<>("Preço");
-        colunaPrecoCompra.setCellValueFactory(dados -> dados.getValue().precoProperty().asObject());
-
-        tabelaProdutosCompra.getColumns().addAll(colunaDescricaoCompra, colunaPrecoCompra);
-
-        // Carregar os produtos da tabela "compraprodutos"
-        carregarProdutosCompra(); // Método que preenche a lista listaProdutosCompra
-        tabelaProdutosCompra.setItems(listaProdutosCompra);
-
-        // Ação ao selecionar um produto
-        tabelaProdutosCompra.getSelectionModel().selectedItemProperty().addListener((obs, antigo, selecionado) -> {
-            if (selecionado != null) {
-                campoDescricao.setText(selecionado.getDescricao());
-                campoPreco.setText(String.valueOf(selecionado.getPreco()));
-
-                // Fechar a janela após a seleção
-                janelaSelecaoProduto.close();
-            }
-        });
-
-        // Criar um botão para adicionar um novo produto
-        Button btnAdicionarProduto = new Button("Adicionar Produto");
-        btnAdicionarProduto.setOnAction(e -> abrirJanelaAdicionarProduto());
-
-        // Layout para organizar a tabela e o botão
-        VBox vbox = new VBox(tabelaProdutosCompra, btnAdicionarProduto);
-        Scene cena = new Scene(vbox);
-        janelaSelecaoProduto.setScene(cena);
-
-        // Configurar a janela para sempre aparecer acima da janela principal
-        Stage stageAtual = (Stage) tabelaEstoque.getScene().getWindow();
-        janelaSelecaoProduto.initOwner(stageAtual); // A janela selecionada será dona da nova janela
-        janelaSelecaoProduto.initModality(Modality.APPLICATION_MODAL); // Modal, impede interações com outras janelas
-        janelaSelecaoProduto.show();
-    }
-
-    private void abrirJanelaAdicionarProduto() {
-        // Criar a nova janela de adicionar produto
-        Stage janelaAdicionarProduto = new Stage();
-        janelaAdicionarProduto.setTitle("Adicionar Produto");
-
-        // Campos de entrada para o novo produto
-        TextField campoDescricaoNovoProduto = new TextField();
-        campoDescricaoNovoProduto.setPromptText("Descrição");
-
-        TextField campoPrecoNovoProduto = new TextField();
-        campoPrecoNovoProduto.setPromptText("Preço");
-
-        TextField campoQuantidadeNovoProduto = new TextField();
-        campoQuantidadeNovoProduto.setPromptText("Quantidade");
-
-        // Botão para adicionar o produto ao estoque
-        Button btnAdicionarNovoProduto = new Button("Adicionar");
-        btnAdicionarNovoProduto.setOnAction(e -> {
-            String descricao = campoDescricaoNovoProduto.getText();
-            double preco = Double.parseDouble(campoPrecoNovoProduto.getText());
-            int quantidade = Integer.parseInt(campoQuantidadeNovoProduto.getText());
-
-            // Adicionar o produto no banco de dados
-            adicionarProdutoAoEstoque(descricao, preco, quantidade);
-
-            // Fechar a janela após adicionar
-            janelaAdicionarProduto.close();
-        });
-
-        // Layout da janela de adicionar produto
-        VBox vboxAdicionarProduto = new VBox(campoDescricaoNovoProduto, campoPrecoNovoProduto, campoQuantidadeNovoProduto, btnAdicionarNovoProduto);
-        Scene cenaAdicionarProduto = new Scene(vboxAdicionarProduto);
-        janelaAdicionarProduto.setScene(cenaAdicionarProduto);
-
-        // Exibir a janela de adicionar produto
-        janelaAdicionarProduto.initModality(Modality.APPLICATION_MODAL);
-        janelaAdicionarProduto.show();
-    }
-
-    private void adicionarProdutoAoEstoque(String descricao, double preco, int quantidade) {
-        String sql = "INSERT INTO estoque (descricao, preco, quantidade) VALUES (?, ?, ?)";
-        try (Connection connection = Database.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, descricao);
-            ps.setDouble(2, preco);
-            ps.setInt(3, quantidade);
-            ps.executeUpdate();
-            exibirAlerta("Produto adicionado com sucesso!");
-            recarregarProdutos();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            exibirAlerta("Erro ao adicionar produto.");
         }
     }
 
     @FXML
     private void adicionarProduto() {
-        String descricao = campoDescricao.getText();
-        double preco = Double.parseDouble(campoPreco.getText());
-        int quantidade = Integer.parseInt(campoQuantidade.getText());
+        // Criar a janela para listar os produtos de CompraProdutos
+        Stage janelaAdicionarProduto = new Stage();
+        janelaAdicionarProduto.setTitle("Adicionar Produto");
 
-        String sql = "INSERT INTO estoque (descricao, preco, quantidade) VALUES (?, ?, ?)";
+        // Criação da tabela de CompraProduto
+        TableView<CompraProduto> tabelaCompraProdutos = new TableView<>();
+        TableColumn<CompraProduto, String> colunaDescricaoCompra = new TableColumn<>("Descrição");
+        colunaDescricaoCompra.setCellValueFactory(dados -> dados.getValue().descricaoProperty());
 
-        try (Connection connection = Database.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, descricao);
-            ps.setDouble(2, preco);
-            ps.setInt(3, quantidade);
-            ps.executeUpdate();
-            exibirAlerta("Produto adicionado com sucesso!");
-            recarregarProdutos();
+        TableColumn<CompraProduto, Double> colunaPrecoCompra = new TableColumn<>("Preço");
+        colunaPrecoCompra.setCellValueFactory(dados -> dados.getValue().precoProperty().asObject());
+
+        // Adicionando a coluna de quantidade comprada
+        TableColumn<CompraProduto, Integer> colunaQuantidadeCompra = new TableColumn<>("Quantidade Comprada");
+        colunaQuantidadeCompra.setCellValueFactory(dados -> dados.getValue().quantidadeProperty().asObject());
+
+        tabelaCompraProdutos.getColumns().addAll(colunaDescricaoCompra, colunaPrecoCompra, colunaQuantidadeCompra);
+
+        ObservableList<CompraProduto> listaCompraProdutos = FXCollections.observableArrayList();
+        carregarProdutosCompra(listaCompraProdutos);
+        tabelaCompraProdutos.setItems(listaCompraProdutos);
+
+        // Spinner ou campo de texto para quantidade comprada
+        Label labelQuantidade = new Label("Quantidade:");
+        Spinner<Integer> spinnerQuantidade = new Spinner<>(1, Integer.MAX_VALUE, 1);
+        spinnerQuantidade.setEditable(true);
+
+        Button btnConfirmar = new Button("Confirmar");
+        btnConfirmar.setOnAction(e -> {
+            CompraProduto produtoSelecionado = tabelaCompraProdutos.getSelectionModel().getSelectedItem();
+            if (produtoSelecionado != null) {
+                int quantidadeComprada = spinnerQuantidade.getValue();  // Captura a quantidade inserida
+                int quantidadeDisponivel = produtoSelecionado.getQuantidade();  // Quantidade disponível na CompraProdutos
+
+                if (quantidadeComprada > quantidadeDisponivel) {
+                    exibirAlerta("Quantidade maior do que a disponível no produto.");
+                } else if (quantidadeComprada > 0) {
+                    // Adiciona o produto ao estoque
+                    adicionarProdutoAoEstoque(produtoSelecionado, quantidadeComprada);
+                    // Decrementa a quantidade em CompraProdutos
+                    atualizarQuantidadeCompra(produtoSelecionado, quantidadeComprada);
+
+                    janelaAdicionarProduto.close();
+                    exibirAlerta("Produto adicionado ao estoque com sucesso!");
+                } else {
+                    exibirAlerta("Por favor, insira uma quantidade válida.");
+                }
+            } else {
+                exibirAlerta("Selecione um produto antes de confirmar.");
+            }
+        });
+
+        VBox layout = new VBox(tabelaCompraProdutos, labelQuantidade, spinnerQuantidade, btnConfirmar);
+        Scene cena = new Scene(layout);
+
+        janelaAdicionarProduto.setScene(cena);
+        janelaAdicionarProduto.initOwner(tabelaEstoque.getScene().getWindow());
+        janelaAdicionarProduto.showAndWait();
+    }
+
+    private void carregarProdutosCompra(ObservableList<CompraProduto> lista) {
+        String sql = "SELECT p.IdProd, cp.IdCompra, cp.Quantidade, p.Descricao, p.Preco " +
+                "FROM CompraProdutos cp " +
+                "JOIN Produto p ON cp.IdProd = p.IdProd";  // Ajuste para incluir a quantidade de compra
+
+        try (Connection connection = Database.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                lista.add(new CompraProduto(
+                        rs.getInt("IdProd"),
+                        rs.getInt("IdCompra"),
+                        rs.getInt("Quantidade"),
+                        rs.getString("Descricao"),
+                        rs.getDouble("Preco")
+                ));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            exibirAlerta("Erro ao adicionar produto.");
         }
     }
 
-    @FXML
-    private void editarProduto() {
-        EstoqueProduto produtoSelecionado = tabelaEstoque.getSelectionModel().getSelectedItem();
-        if (produtoSelecionado == null) {
-            exibirAlerta("Selecione um produto para editar.");
-            return;
-        }
 
-        String descricao = campoDescricao.getText();
-        double preco = Double.parseDouble(campoPreco.getText());
-        int quantidade = Integer.parseInt(campoQuantidade.getText());
+    private void adicionarProdutoAoEstoque(CompraProduto produto, int quantidade) {
+        // Atualizar a quantidade do produto no estoque se já existir
+        String sqlSelect = "SELECT Quantidade FROM Estoque WHERE idprod = ?";
+        try (Connection connection = Database.getConnection();
+             PreparedStatement psSelect = connection.prepareStatement(sqlSelect)) {
+            psSelect.setInt(1, produto.getIdProd());
+            ResultSet rs = psSelect.executeQuery();
 
-        String sql = "UPDATE estoque SET descricao = ?, preco = ?, quantidade = ? WHERE idprod = ?";
+            if (rs.next()) {
+                // Produto já existe, atualizar quantidade
+                int quantidadeAtual = rs.getInt("Quantidade");
+                int novaQuantidade = quantidadeAtual + quantidade;
 
-        try (Connection connection = Database.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, descricao);
-            ps.setDouble(2, preco);
-            ps.setInt(3, quantidade);
-            ps.setInt(4, produtoSelecionado.getIdProd());
-            ps.executeUpdate();
-            exibirAlerta("Produto editado com sucesso!");
-            recarregarProdutos();
+                String sqlUpdate = "UPDATE Estoque SET Quantidade = ? WHERE idprod = ?";
+                try (PreparedStatement psUpdate = connection.prepareStatement(sqlUpdate)) {
+                    psUpdate.setInt(1, novaQuantidade);
+                    psUpdate.setInt(2, produto.getIdProd());
+                    psUpdate.executeUpdate();
+                }
+            } else {
+                // Produto não existe, adicionar novo
+                String sqlInsert = "INSERT INTO Estoque (idprod, descricao, preco, quantidade) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement psInsert = connection.prepareStatement(sqlInsert)) {
+                    psInsert.setInt(1, produto.getIdProd());
+                    psInsert.setString(2, produto.getDescricao());
+                    psInsert.setDouble(3, produto.getPreco());
+                    psInsert.setInt(4, quantidade);
+                    psInsert.executeUpdate();
+                }
+            }
+
+            carregarProdutosEstoque();  // Atualiza a tabela de estoque após a inserção/atualização
         } catch (SQLException e) {
             e.printStackTrace();
-            exibirAlerta("Erro ao editar produto.");
         }
+    }
+    private void atualizarQuantidadeCompra(CompraProduto produto, int quantidade) {
+        // Decrementar a quantidade do produto na tabela CompraProdutos
+        String sqlUpdateCompra = "UPDATE CompraProdutos SET Quantidade = Quantidade - ? WHERE IdProd = ? AND IdCompra = ?";
+        try (Connection connection = Database.getConnection();
+             PreparedStatement psUpdateCompra = connection.prepareStatement(sqlUpdateCompra)) {
+            psUpdateCompra.setInt(1, quantidade);
+            psUpdateCompra.setInt(2, produto.getIdProd());
+            psUpdateCompra.setInt(3, produto.getIdCompra());
+            psUpdateCompra.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void editarProduto() {
+
     }
 
     @FXML
     private void removerProduto() {
-        EstoqueProduto produtoSelecionado = tabelaEstoque.getSelectionModel().getSelectedItem();
-        if (produtoSelecionado == null) {
-            exibirAlerta("Selecione um produto para remover.");
-            return;
-        }
 
-        String sql = "DELETE FROM estoque WHERE idprod = ?";
-
-        try (Connection connection = Database.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, produtoSelecionado.getIdProd());
-            ps.executeUpdate();
-            exibirAlerta("Produto removido com sucesso!");
-            recarregarProdutos();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            exibirAlerta("Erro ao remover produto.");
-        }
-    }
-
-    private void recarregarProdutos() {
-        listaProdutos.clear();
-        carregarProdutos();
     }
 
     private void exibirAlerta(String mensagem) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Informação");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+
+        // Garante que a janela de alerta fique no topo da pilha de janelas
+        alert.initOwner(tabelaEstoque.getScene().getWindow());
+        alert.showAndWait(); // Isso bloqueia a interação com outras janelas até o alerta ser fechado
+    }
+
+
+    @FXML
+    private void voltar(ActionEvent event){
+        carregarTela("/com/gerencia/estoque/painel-adm/painel-adm.fxml", "Voltar", event);
+    }
+
+    private void carregarTela(String caminhoFXML, String titulo, ActionEvent event) {
+        try {
+            // Obtem a janela atual a partir do evento, se disponível
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource(caminhoFXML));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle(titulo);
+            stage.setFullScreenExitHint("");
+            stage.setFullScreen(true);
+
+            stage.show();
+        } catch (IOException e) {
+            mostrarAlerta("Erro", "Falha ao carregar a tela: " + e.getMessage());
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();

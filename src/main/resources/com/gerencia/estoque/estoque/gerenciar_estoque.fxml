@@ -3,25 +3,36 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="gerenciarEstoquePane" alignment="CENTER" spacing="20"
-      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.gerencia.estoque.controller.estoque.GerenciarEstoqueController">
+<VBox fx:id="gerenciarEstoquePane" alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.GerenciarEstoqueController">
 
+    <!-- Tabela de Produtos -->
     <TableView fx:id="tabelaEstoque">
         <columns>
-            <TableColumn fx:id="colunaDescricao" text="Descrição" />
-            <TableColumn fx:id="colunaPreco" text="Preço" />
-            <TableColumn fx:id="colunaQuantidade" text="Quantidade" />
+            <TableColumn fx:id="colunaDescricao" prefWidth="146.0" text="Descrição" />
+            <TableColumn fx:id="colunaPreco" prefWidth="161.0" text="Preço" />
+            <TableColumn fx:id="colunaQuantidade" prefWidth="158.0" text="Quantidade" />
         </columns>
     </TableView>
 
-    <HBox alignment="CENTER" spacing="15">
-        <Button onAction="#abrirJanelaSelecionarProduto" text="Adicionar Produto" />
-        <Button onAction="#editarProduto" text="Editar Produto" />
-        <Button onAction="#removerProduto" text="Remover Produto" />
-    </HBox>
+    <!-- Campos de Entrada para Descrição, Preço e Quantidade -->
+    <VBox alignment="CENTER" spacing="10">
+        <HBox spacing="10">
+            <TextField fx:id="campoDescricao" promptText="Descrição" />
+            <TextField fx:id="campoPreco" promptText="Preço" />
+            <TextField fx:id="campoQuantidade" promptText="Quantidade" />
+        </HBox>
 
+        <!-- Botões de Ação -->
+        <HBox alignment="CENTER" spacing="15">
+            <Button onAction="#adicionarProduto" text="Adicionar Produto" />
+            <Button onAction="#editarProduto" text="Editar Produto" />
+            <Button onAction="#removerProduto" text="Remover Produto" />
+        </HBox>
+    </VBox>
+
+    <Button onAction="#voltar" text="Voltar" />
 </VBox>
