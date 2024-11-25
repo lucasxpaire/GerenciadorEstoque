@@ -166,6 +166,72 @@ public class EstoqueController {
         }
     }
 
+    @FXML
+    private void editarItemEstoque(ActionEvent event) {
+        Estoque itemSelecionado = tabelaEstoque.getSelectionModel().getSelectedItem();
+
+        if (itemSelecionado == null) {
+            mostrarAlerta("Aviso", "Selecione um item para editar.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/estoque/editar-item.fxml"));
+            Parent root = loader.load();
+
+            // Passa o item selecionado para o controlador da tela de edição
+            EditarItemController controller = loader.getController();
+            controller.setItemEstoque(itemSelecionado);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Editar Item do Estoque");
+            stage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            stage.initOwner(((javafx.scene.Node) event.getSource()).getScene().getWindow());
+            stage.showAndWait();
+
+            carregarProdutosEstoque(); // Recarrega a tabela após a edição
+        } catch (IOException e) {
+            mostrarAlerta("Erro", "Falha ao abrir a tela de edição: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void abrirRemoverItem(ActionEvent event) {
+        Estoque itemSelecionado = tabelaEstoque.getSelectionModel().getSelectedItem();
+
+        if (itemSelecionado == null) {
+            mostrarAlerta("Atenção", "Por favor, selecione um item para remover.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/estoque/remover-item.fxml"));
+            Parent root = loader.load();
+
+            RemoverItemController controller = loader.getController();
+            controller.setItemEstoque(itemSelecionado);
+
+            Stage janela = new Stage();
+            Scene cena = new Scene(root);
+            janela.setScene(cena);
+            janela.setTitle("Remover Item");
+            janela.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            janela.initOwner(((javafx.scene.Node) event.getSource()).getScene().getWindow());
+            janela.showAndWait();
+
+            carregarProdutosEstoque(); // Atualiza a tabela após a remoção
+
+        } catch (IOException e) {
+            mostrarAlerta("Erro", "Falha ao abrir a tela de Remover Item: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);

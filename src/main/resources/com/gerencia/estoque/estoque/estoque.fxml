@@ -10,20 +10,21 @@
 <VBox fx:id="estoquePane" alignment="TOP_CENTER" prefHeight="600" prefWidth="800" spacing="20" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.EstoqueController">
 
     <!-- Contêiner interno para adicionar espaçamento ao redor da tabela -->
-    <VBox alignment="CENTER" prefHeight="440.0" prefWidth="719.0" spacing="20" style="-fx-padding: 20;">
+    <VBox alignment="CENTER" prefHeight="496.0" prefWidth="800.0" spacing="20" style="-fx-padding: 20;">
+      <VBox prefHeight="200.0" prefWidth="100.0" />
 
         <!-- Título -->
         <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Estoque Atual" />
 
         <!-- TableView para exibir os itens no estoque -->
-        <TableView fx:id="tabelaEstoque" editable="false" maxHeight="405.0" maxWidth="719.0">
+        <TableView fx:id="tabelaEstoque" editable="false" maxHeight="405.0" maxWidth="719.0" prefHeight="397.0" prefWidth="719.0">
             <columns>
                 <!-- Coluna para Descrição -->
-                <TableColumn fx:id="colunaDescricao" text="Descrição" prefWidth="238.0" />
+                <TableColumn fx:id="colunaDescricao" prefWidth="238.0" text="Descrição" />
                 <!-- Coluna para Preço -->
-                <TableColumn fx:id="colunaPreco" text="Preço" prefWidth="211.0" />
+                <TableColumn fx:id="colunaPreco" prefWidth="211.0" text="Preço" />
                 <!-- Coluna para Quantidade -->
-                <TableColumn fx:id="colunaQuantidade" text="Quantidade" prefWidth="249.0" />
+                <TableColumn fx:id="colunaQuantidade" prefWidth="249.0" text="Quantidade" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -37,7 +38,12 @@
         <Button onAction="#abrirComprarMaisQuantidade" style="-fx-background-color: #262626; -fx-text-fill: white; -fx-font-size: 16px;" text="Comprar Mais Quantidade" />
         <!-- Botão para Adicionar Novo Item -->
         <Button onAction="#abrirAdicionarNovoItem" style="-fx-background-color: #262626; -fx-text-fill: white; -fx-font-size: 16px;" text="Adicionar Novo Item" />
+        <!-- Botão para Editar Item -->
+        <Button onAction="#editarItemEstoque" style="-fx-background-color: #262626; -fx-text-fill: white; -fx-font-size: 16px;" text="Editar Item" />
+        <!-- Botão para Remover Item -->
+        <Button onAction="#abrirRemoverItem" style="-fx-background-color: #262626; -fx-text-fill: white; -fx-font-size: 16px;" text="Remover Item" />
     </HBox>
+
 
     <Button onAction="#voltar" text="Voltar" />
 </VBox>
