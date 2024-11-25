@@ -1,14 +1,16 @@
 package com.gerencia.estoque.model.estoque;
 
-public class Produto {
+public class Estoque {
     private int idProduto;
     private double preco;
     private String descricao;
+    private int quantidade;
 
-    public Produto(int idProduto, double preco, String descricao) {
+    public Estoque(int idProduto, double preco, String descricao, int quantidade) {
         this.idProduto = idProduto;
         this.preco = preco;
         this.descricao = descricao;
+        this.quantidade = quantidade;
     }
 
     public int getIdProduto() {
@@ -35,12 +37,21 @@ public class Produto {
         this.descricao = descricao;
     }
 
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
     @Override
     public String toString() {
-        return "Produto{" +
+        return "Estoque{" +
                 "idProduto=" + idProduto +
                 ", preco=" + preco +
                 ", descricao='" + descricao + '\'' +
+                ", quantidade=" + quantidade +
                 '}';
     }
 }

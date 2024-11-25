@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.estoque.ComprarMaisQuantidadeController"
+      alignment="CENTER" spacing="20" prefWidth="400" prefHeight="300" style="-fx-background-color: white;">
+
+    <!-- Título -->
+    <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Comprar Mais Quantidade"/>
+
+    <!-- Seleção de Produto -->
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Selecione o Produto:"/>
+        <ComboBox fx:id="comboProduto" prefWidth="250"/>
+    </HBox>
+
+    <!-- Quantidade a ser comprada -->
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Quantidade:"/>
+        <TextField fx:id="quantidadeField" prefWidth="100"/>
+    </HBox>
+
+    <!-- Botões -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Confirmar" onAction="#confirmarCompra" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+        <Button text="Cancelar" onAction="#fecharJanela" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+    </HBox>
+</VBox>

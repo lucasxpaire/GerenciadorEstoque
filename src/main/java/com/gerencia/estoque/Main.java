@@ -18,7 +18,7 @@ public class Main extends Application {
             if (!Database.areCredentialsConfigured()) {
                 addDefaultCredentials();
             }
-            Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/login/login.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/login.fxml"));
             primaryStage.setTitle("Login");
             primaryStage.setScene(new Scene(root));
             primaryStage.setFullScreen(true);

@@ -27,5 +27,6 @@ module com.gerencia.estoque {
     exports com.gerencia.estoque.controller.paineladm;
     opens com.gerencia.estoque.controller.paineladm to javafx.fxml;
 
-
+    // Abrindo o pacote com a classe TabelaEstoque para o módulo javafx.base
+    opens com.gerencia.estoque.model.estoque to javafx.base;  // Adicionando essa linha
 }

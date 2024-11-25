@@ -88,7 +88,7 @@ public class VisaoGeralController {
 
     @FXML
     public void voltar(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-adm/painel-adm.fxml", "Painel de Controle do Proprietário", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Painel de Controle do Proprietário", event);
     }
 
     private void carregarTela(String caminhoFXML, String titulo, ActionEvent event) {

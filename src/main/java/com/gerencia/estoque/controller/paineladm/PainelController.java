@@ -14,17 +14,17 @@ public class PainelController {
 
     @FXML
     public void goToVisaoGeral(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-adm/visao-geral.fxml", "Visão Geral do Dono", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/visao-geral.fxml", "Visão Geral do Dono", event);
     }
 
     @FXML
     public void goToRelatorios(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-adm/relatorios.fxml", "Relatórios Detalhados", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/relatorios.fxml", "Relatórios Detalhados", event);
     }
 
     @FXML
     public void goToManterFuncionarios(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-adm/manter-funcionarios.fxml", "Configuração de Funcionários", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/manter-funcionarios.fxml", "Configuração de Funcionários", event);
     }
     @FXML
     public void goToManterEstoque(ActionEvent event) {
@@ -37,7 +37,7 @@ public class PainelController {
 
     @FXML
     public void voltar(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/login/login.fxml", "Login", event);
+        carregarTela("/com/gerencia/estoque/login.fxml", "Login", event);
     }
 
     // Método para carregar a tela específica
