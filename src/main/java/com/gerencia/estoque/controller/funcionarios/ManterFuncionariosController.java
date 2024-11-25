@@ -47,10 +47,19 @@ public class ManterFuncionariosController {
     @FXML
     public void initialize() {
         listaFuncionarios = FXCollections.observableArrayList();
+
+        // Configurar o alinhamento de cada coluna
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaNome.setStyle("-fx-alignment: CENTER;");
+
         colunaUsuario.setCellValueFactory(param -> new SimpleStringProperty(getCredencialUsuario(param.getValue().getIdCredencial())));
+        colunaUsuario.setStyle("-fx-alignment: CENTER;");
+
         colunaTipo.setCellValueFactory(param -> new SimpleStringProperty(getCredencialTipo(param.getValue().getIdCredencial())));
+        colunaTipo.setStyle("-fx-alignment: CENTER;");
+
         colunaSenha.setCellValueFactory(param -> new SimpleStringProperty(getCredencialSenha(param.getValue().getIdCredencial())));
+        colunaSenha.setStyle("-fx-alignment: CENTER;");
 
         tableFuncionarios.setItems(listaFuncionarios);
         carregarFuncionarios();
@@ -66,9 +75,11 @@ public class ManterFuncionariosController {
         });
     }
 
+
+
     private String getCredencialTipo(int idCredencial) {
         String tipo = "";
-        String sql = "SELECT tipo FROM credencial WHERE idCredencial = ?";
+        String sql = "SELECT tipo FROM credenciais WHERE idCredencial = ?";  // Alterado para 'credenciais'
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
@@ -82,10 +93,11 @@ public class ManterFuncionariosController {
         return tipo;
     }
 
+
     // Método para obter o usuário a partir da credencial
     private String getCredencialUsuario(int idCredencial) {
         String usuario = "";
-        String sql = "SELECT usuario FROM credencial WHERE idCredencial = ?";
+        String sql = "SELECT usuario FROM credenciais WHERE idCredencial = ?";  // Alterado para 'credenciais'
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
@@ -99,10 +111,11 @@ public class ManterFuncionariosController {
         return usuario;
     }
 
+
     // Método para obter a senha a partir da credencial (usado apenas para exibição segura)
     private String getCredencialSenha(int idCredencial) {
         String senha = "";
-        String sql = "SELECT senha FROM credencial WHERE idCredencial = ?";
+        String sql = "SELECT senha FROM credenciais WHERE idCredencial = ?";  // Alterado para 'credenciais'
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCredencial);
@@ -116,22 +129,84 @@ public class ManterFuncionariosController {
         return senha;
     }
 
+
     private void carregarFuncionarios() {
         listaFuncionarios.clear();
-        String sql = "SELECT f.idFuncionario, f.nome, f.idCredencial FROM funcionario f";
+        String sql = "SELECT f.idFuncionario, f.idCredencial, f.nome, c.usuario, c.tipo, c.senha FROM funcionario f " +
+                "JOIN credenciais c ON f.idCredencial = c.idCredencial";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Funcionario funcionario = new Funcionario(
                         rs.getInt("idFuncionario"),
-                        rs.getString("nome"),
-                        rs.getInt("idCredencial")
+                        rs.getInt("idCredencial"),
+                        rs.getString("nome")
                 );
+                // Aqui você pode definir a credencial como parte do objeto Funcionario se for necessário
                 listaFuncionarios.add(funcionario);
             }
         } catch (SQLException e) {
             showAlert("Erro", "Erro ao carregar funcionários: " + e.getMessage());
+        }
+    }
+
+
+    @FXML
+    public void editarFuncionario() {
+        Funcionario funcionarioSelecionado = tableFuncionarios.getSelectionModel().getSelectedItem();
+
+        if (funcionarioSelecionado != null) {
+            funcionarioSelecionado.setNome(campoNome.getText());
+            String novoUsuario = campoUsuario.getText();
+            String novaSenha = campoSenha.getText();
+
+            atualizarCredencial(funcionarioSelecionado.getIdCredencial(), novoUsuario, novaSenha);
+            atualizarFuncionario(funcionarioSelecionado);
+            showAlert("Sucesso", "Funcionário editado com sucesso.");
+            carregarFuncionarios();
+            limparCampos(); // Limpa os campos após editar
+        } else {
+            showAlert("Erro", "Selecione um funcionário para editar.");
+        }
+    }
+
+    @FXML
+    public void removerFuncionario() {
+        Funcionario funcionarioSelecionado = tableFuncionarios.getSelectionModel().getSelectedItem();
+
+        if (funcionarioSelecionado != null) {
+            int idFuncionario = funcionarioSelecionado.getIdFuncionario();
+            int idCredencial = funcionarioSelecionado.getIdCredencial();
+
+            String sqlFuncionario = "DELETE FROM funcionario WHERE idFuncionario = ?";
+            String sqlCredencial = "DELETE FROM credenciais WHERE idCredencial = ?";
+
+            try (Connection conn = Database.getConnection()) {
+                conn.setAutoCommit(false); // Inicia a transação
+
+                // Remove o funcionário
+                try (PreparedStatement stmtFuncionario = conn.prepareStatement(sqlFuncionario)) {
+                    stmtFuncionario.setInt(1, idFuncionario);
+                    stmtFuncionario.executeUpdate();
+                }
+
+                // Remove a credencial
+                try (PreparedStatement stmtCredencial = conn.prepareStatement(sqlCredencial)) {
+                    stmtCredencial.setInt(1, idCredencial);
+                    stmtCredencial.executeUpdate();
+                }
+
+                conn.commit(); // Confirma a transação
+                showAlert("Sucesso", "Funcionário removido com sucesso.");
+                carregarFuncionarios(); // Atualiza a lista de funcionários
+                limparCampos(); // Limpa os campos após remover
+
+            } catch (SQLException e) {
+                showAlert("Erro", "Erro ao remover funcionário: " + e.getMessage());
+            }
+        } else {
+            showAlert("Erro", "Selecione um funcionário para remover.");
         }
     }
 
@@ -147,7 +222,7 @@ public class ManterFuncionariosController {
             return;
         }
 
-        String sqlCredencial = "INSERT INTO credencial (usuario, senha, tipo) VALUES (?, ?, ?)";
+        String sqlCredencial = "INSERT INTO credenciais (usuario, senha, tipo) VALUES (?, ?, ?)";
         String sqlFuncionario = "INSERT INTO funcionario (idCredencial, nome) VALUES (?, ?)";
 
         try (Connection conn = Database.getConnection()) {
@@ -181,7 +256,7 @@ public class ManterFuncionariosController {
                 conn.commit(); // Confirma a transação
                 showAlert("Sucesso", "Funcionário adicionado com sucesso.");
                 carregarFuncionarios();
-                limparCampos();
+                limparCampos(); // Limpa os campos após adicionar
 
             } catch (SQLException e) {
                 conn.rollback(); // Reverte a transação em caso de erro
@@ -193,64 +268,9 @@ public class ManterFuncionariosController {
         }
     }
 
-    @FXML
-    public void editarFuncionario() {
-        Funcionario funcionarioSelecionado = tableFuncionarios.getSelectionModel().getSelectedItem();
-
-        if (funcionarioSelecionado != null) {
-            funcionarioSelecionado.setNome(campoNome.getText());
-            String novoUsuario = campoUsuario.getText();
-            String novaSenha = campoSenha.getText();
-
-            atualizarCredencial(funcionarioSelecionado.getIdCredencial(), novoUsuario, novaSenha);
-            atualizarFuncionario(funcionarioSelecionado);
-            carregarFuncionarios();
-        } else {
-            showAlert("Erro", "Selecione um funcionário para editar.");
-        }
-    }
-
-    @FXML
-    public void removerFuncionario() {
-        Funcionario funcionarioSelecionado = tableFuncionarios.getSelectionModel().getSelectedItem();
-
-        if (funcionarioSelecionado != null) {
-            int idFuncionario = funcionarioSelecionado.getIdFuncionario();
-            int idCredencial = funcionarioSelecionado.getIdCredencial();
-
-            String sqlFuncionario = "DELETE FROM funcionario WHERE idFuncionario = ?";
-            String sqlCredencial = "DELETE FROM credencial WHERE idCredencial = ?";
-
-            try (Connection conn = Database.getConnection()) {
-                conn.setAutoCommit(false); // Inicia a transação
-
-                // Remove o funcionário
-                try (PreparedStatement stmtFuncionario = conn.prepareStatement(sqlFuncionario)) {
-                    stmtFuncionario.setInt(1, idFuncionario);
-                    stmtFuncionario.executeUpdate();
-                }
-
-                // Remove a credencial
-                try (PreparedStatement stmtCredencial = conn.prepareStatement(sqlCredencial)) {
-                    stmtCredencial.setInt(1, idCredencial);
-                    stmtCredencial.executeUpdate();
-                }
-
-                conn.commit(); // Confirma a transação
-                showAlert("Sucesso", "Funcionário removido com sucesso.");
-                carregarFuncionarios(); // Atualiza a lista de funcionários
-
-            } catch (SQLException e) {
-                showAlert("Erro", "Erro ao remover funcionário: " + e.getMessage());
-            }
-        } else {
-            showAlert("Erro", "Selecione um funcionário para remover.");
-        }
-    }
-
 
     private void atualizarCredencial(int idCredencial, String usuario, String senha) {
-        String sql = "UPDATE credencial SET usuario = ?, senha = ? WHERE idCredencial = ?";
+        String sql = "UPDATE credenciais SET usuario = ?, senha = ? WHERE idCredencial = ?";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usuario);
@@ -279,7 +299,13 @@ public class ManterFuncionariosController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        alert.showAndWait();
+
+        // Obtendo a janela principal para configurar o alerta acima dela
+        Stage stage = (Stage) campoNome.getScene().getWindow();
+        alert.initOwner(stage);  // Define o dono da janela do alerta
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
+
+        alert.showAndWait();  // Exibe o alerta
     }
 
     private void limparCampos() {

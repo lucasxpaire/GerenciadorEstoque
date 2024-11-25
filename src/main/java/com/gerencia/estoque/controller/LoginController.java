@@ -40,10 +40,10 @@ public class LoginController {
         } else if (verificarLogin(usuario, senha)) {
             // Se o usuário contém 'adm', redireciona para a tela de Proprietário
             if (usuario.contains("prop")) {
-                carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Visão Geral do Dono");
+                carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Painel do Proprietário");
             } else {
                 // Senão, redireciona para a tela de Funcionário
-                carregarTela("/com/gerencia/estoque/funcionario-view.fxml", "Tela do Funcionário");
+                carregarTela("/com/gerencia/estoque/painel-func.fxml", "Painel do Funcionário");
             }
         } else {
             mostrarAlerta("Erro", "Usuário ou senha incorretos.");

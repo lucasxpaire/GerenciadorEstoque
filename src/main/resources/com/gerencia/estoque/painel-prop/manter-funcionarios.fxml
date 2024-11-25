@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.funcionarios.ManterFuncionariosController" style="-fx-padding: 20;">
+<VBox alignment="CENTER" prefHeight="703.0" prefWidth="513.0" spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.funcionarios.ManterFuncionariosController">
 
     <!-- Título -->
-    <Label text="Gerenciamento de Funcionários" style="-fx-font-size: 24px; -fx-text-fill: #000000;" />
+    <Label style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Gerenciamento de Funcionários" />
 
     <!-- TableView centralizada com largura fixa e espaçamento nas laterais -->
-    <TableView fx:id="tableFuncionarios" prefWidth="600" style="-fx-background-color: #f0f0f0; -fx-border-color: #000000; -fx-border-width: 1px;">
+    <TableView fx:id="tableFuncionarios" maxHeight="400.0" maxWidth="550.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #000000; -fx-border-width: 1px;">
         <columns>
-            <TableColumn fx:id="colunaNome" text="Nome Completo" prefWidth="200" style="-fx-alignment: CENTER-LEFT;"/>
-            <TableColumn fx:id="colunaTipo" text="Função" prefWidth="150" style="-fx-alignment: CENTER-LEFT;"/>
-            <TableColumn fx:id="colunaUsuario" text="Usuário" prefWidth="150" style="-fx-alignment: CENTER-LEFT;"/>
-            <TableColumn fx:id="colunaSenha" text="Senha" prefWidth="150" style="-fx-alignment: CENTER-LEFT;"/>
+            <TableColumn fx:id="colunaNome" prefWidth="200" style="-fx-alignment: CENTER-LEFT;" text="Nome" />
+            <TableColumn fx:id="colunaTipo" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" text="Função" />
+            <TableColumn fx:id="colunaUsuario" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" text="Usuário" />
+            <TableColumn fx:id="colunaSenha" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" text="Senha" />
         </columns>
+      <columnResizePolicy>
+         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+      </columnResizePolicy>
     </TableView>
 
     <!-- Caixa de texto centralizada e espaçada -->
-    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 0 50 0 50;">
-        <TextField fx:id="campoNome" promptText="Nome Completo" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
+    <VBox alignment="CENTER" maxHeight="138.0" maxWidth="443.0" spacing="10" style="-fx-padding: 0 50 0 50;">
+        <TextField fx:id="campoNome" prefHeight="27.0" prefWidth="366.0" promptText="Nome Completo" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
         <TextField fx:id="campoTipo" promptText="Função" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
         <TextField fx:id="campoUsuario" promptText="Usuário" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
         <PasswordField fx:id="campoSenha" promptText="Senha" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
@@ -29,9 +31,9 @@
 
     <!-- Botões alinhados centralizados e espaçados -->
     <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
-        <Button text="Adicionar" onAction="#adicionarFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
-        <Button text="Editar" onAction="#editarFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
-        <Button text="Remover" onAction="#removerFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
-        <Button text="Voltar" onAction="#voltar" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+        <Button onAction="#adicionarFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Adicionar" />
+        <Button onAction="#editarFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Editar" />
+        <Button onAction="#removerFuncionario" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Remover" />
+        <Button onAction="#voltar" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Voltar" />
     </HBox>
 </VBox>

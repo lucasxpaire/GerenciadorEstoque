@@ -237,7 +237,13 @@ public class EstoqueController {
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
-        alert.showAndWait();
+
+        // Obtendo a janela principal para configurar o alerta acima dela
+        Stage stage = (Stage) tabelaEstoque.getScene().getWindow();
+        alert.initOwner(stage);  // Define o dono da janela do alerta
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
+
+        alert.showAndWait();  // Exibe o alerta
     }
 
     @FXML
