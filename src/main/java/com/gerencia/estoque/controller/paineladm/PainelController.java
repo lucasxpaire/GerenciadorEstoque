@@ -32,7 +32,7 @@ public class PainelController {
     }
     @FXML
     public void goToVender(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/vender/vender.fxml", "Vender Produto", event);
+        carregarTela("/com/gerencia/estoque/transacao/transacao.fxml", "Vender Produto", event);
     }
 
     @FXML

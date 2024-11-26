@@ -9,7 +9,6 @@
 
     <Button onAction="#goToVisaoGeral" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Visão Geral" />
     <Button onAction="#goToVender" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Transação" />
-    <Button onAction="#goToVender" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Clientes" />
     <Button onAction="#goToManterEstoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Estoque" />
     <Button onAction="#goToRelatorios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Relatórios" />
     <Button onAction="#goToManterFuncionarios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Funcionários" />
