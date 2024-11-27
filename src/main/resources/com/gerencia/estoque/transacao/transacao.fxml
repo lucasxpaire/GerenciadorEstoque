@@ -33,21 +33,22 @@
     <HBox alignment="CENTER" spacing="10">
         <TextField fx:id="tfQuantidade" prefHeight="30.0" prefWidth="150.0" promptText="Digite a quantidade" />
     </HBox>
-     <!-- Botão Adicionar Item -->
-     <Button onAction="#adicionarItem" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Adicionar Item" />
 
     <!-- Botões de Ação -->
-    <HBox alignment="CENTER" prefHeight="24.0" prefWidth="463.0" spacing="20" style="-fx-padding: 20;">
+    <HBox alignment="CENTER" prefHeight="46.0" prefWidth="463.0" spacing="20.0" style="-fx-padding: 20;">
         <Button onAction="#handleAbrirCadastroCliente" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Cadastrar Cliente" />
-    </HBox>
 
-    <!-- Botão Verificar Fidelidade -->
-    <HBox alignment="CENTER" spacing="10">
+       <!-- Botão Adicionar Item -->
+       <Button onAction="#adicionarItem" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Adicionar Item" />
         <Button onAction="#verificarFidelidade" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Verificar Fidelidade" />
     </HBox>
+    <ComboBox fx:id="cbDesconto" prefHeight="25.0" prefWidth="228.0" promptText="Selecione o Desconto" />
 
-   <Label alignment="CENTER" prefHeight="20.0" prefWidth="249.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Resumo da Transação" />
+    <!-- Botão Verificar Fidelidade -->
+    <HBox alignment="CENTER" spacing="10" />
 
+
+       <Label alignment="CENTER" prefHeight="20.0" prefWidth="249.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Resumo da Transação" />
 
     <!-- Exibir pontos e desconto -->
     <HBox alignment="CENTER" spacing="10">
@@ -66,7 +67,11 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
     </TableView>
-     <Button onAction="#handleConfirmarTransacao" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Confirmar Transação" />
+
+    <!-- Label para mostrar o preço total após desconto -->
+    <Label fx:id="lblPrecoTotal" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Preço Total: R$ 0.00" />
+
+    <Button onAction="#handleConfirmarTransacao" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Confirmar Transação" />
 
     <!-- Botão Voltar -->
     <HBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">

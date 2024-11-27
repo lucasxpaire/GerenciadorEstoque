@@ -43,11 +43,19 @@ public class CadastroClienteController {
         }
 
         try (Connection connection = Database.getConnection()) {
-            String sql = "INSERT INTO Cliente (Nome, CPF) VALUES (?, ?)";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            // Primeiro insere o cliente na tabela Cliente
+            String sqlCliente = "INSERT INTO Cliente (Nome, CPF) VALUES (?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(sqlCliente)) {
                 statement.setString(1, nome);
                 statement.setString(2, cpf);
                 statement.executeUpdate();
+            }
+
+            // Agora, insere o cliente na tabela Fidelidade com 0 pontos
+            String sqlFidelidade = "INSERT INTO Fidelidade (IdCliente, Pontos) VALUES ((SELECT IdCliente FROM Cliente WHERE CPF = ?), 0)";
+            try (PreparedStatement statementFidelidade = connection.prepareStatement(sqlFidelidade)) {
+                statementFidelidade.setString(1, cpf);
+                statementFidelidade.executeUpdate();
             }
 
             mostrarAlerta("Sucesso", "Cliente cadastrado com sucesso!", Alert.AlertType.INFORMATION);
@@ -60,4 +68,5 @@ public class CadastroClienteController {
             mostrarAlerta("Erro", "Erro ao cadastrar cliente: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
+
 }
