@@ -18,14 +18,27 @@ public class CadastroClienteController {
     @FXML
     private TextField tfCpf;
 
+    // Método para exibir alertas consistentes com o TransacaoController
+    private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipoAlerta) {
+        Alert alert = new Alert(tipoAlerta);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+
+        // Obtém a janela principal para centralizar o alerta
+        Stage stage = (Stage) tfNome.getScene().getWindow();
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        alert.showAndWait();
+    }
+
     @FXML
     private void handleSalvar() {
         String nome = tfNome.getText();
         String cpf = tfCpf.getText();
 
         if (nome.isEmpty() || cpf.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Todos os campos são obrigatórios.");
-            alert.show();
+            mostrarAlerta("Erro", "Todos os campos são obrigatórios.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -37,16 +50,14 @@ public class CadastroClienteController {
                 statement.executeUpdate();
             }
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Cliente cadastrado com sucesso!");
-            alert.show();
+            mostrarAlerta("Sucesso", "Cliente cadastrado com sucesso!", Alert.AlertType.INFORMATION);
 
             // Fecha a janela após o sucesso
             Stage stage = (Stage) tfNome.getScene().getWindow();
             stage.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao cadastrar cliente.");
-            alert.show();
+            mostrarAlerta("Erro", "Erro ao cadastrar cliente: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 }
