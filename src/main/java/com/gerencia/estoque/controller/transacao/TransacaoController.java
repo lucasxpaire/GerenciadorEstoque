@@ -85,6 +85,8 @@ public class TransacaoController {
         colQuantidade.setStyle("-fx-alignment: center;");
         colPreco.setStyle("-fx-alignment: center;");
         cbDesconto.setValue("Nenhum Desconto");
+
+
     }
 
 
@@ -179,6 +181,7 @@ public class TransacaoController {
 
     @FXML
     private void handleConfirmarTransacao() {
+
         Funcionario funcionarioSelecionado = cbFuncionario.getValue(); // Obter o funcionário selecionado
 
         if (funcionarioSelecionado == null || resumoTransacao.isEmpty()) {
@@ -190,6 +193,25 @@ public class TransacaoController {
         double valorTotalTransacao = valorTotal; // Usa o valor acumulado inicial
 
         try (Connection connection = Database.getConnection()) {
+            // Verifica se é a primeira compra do cliente
+            boolean primeiraCompra = true;
+            if (clienteSelecionado != null) {
+                String queryVerificaPrimeiraCompra = "SELECT COUNT(*) FROM Transacao WHERE IdCliente = ?";
+                try (PreparedStatement statementVerifica = connection.prepareStatement(queryVerificaPrimeiraCompra)) {
+                    statementVerifica.setInt(1, clienteSelecionado.getIdCliente());
+                    ResultSet rsVerifica = statementVerifica.executeQuery();
+                    if (rsVerifica.next() && rsVerifica.getInt(1) > 0) {
+                        primeiraCompra = false;
+                    }
+                }
+            }
+
+            // Aplica o desconto de 15% se for a primeira compra
+            if (primeiraCompra) {
+                valorTotalTransacao *= 0.85;  // Aplica o desconto de 15%
+                mostrarAlerta("Desconto Aplicado", "Foi aplicado um cupom de 15% de desconto por ser a primeira compra do cliente.", Alert.AlertType.INFORMATION);
+            }
+
             // Processa cada item da transação
             for (ItemResumo item : resumoTransacao) {
                 Produto produtoSelecionado = listaProdutos.stream()
@@ -244,7 +266,7 @@ public class TransacaoController {
                 }
             }
 
-            // Verifica e aplica desconto, se selecionado
+            // Verifica e aplica desconto adicional, se selecionado
             String descontoSelecionado = cbDesconto.getValue();
             if (descontoSelecionado != null && !descontoSelecionado.isEmpty()) {
                 double percentualDesconto = 0.0;
@@ -262,26 +284,6 @@ public class TransacaoController {
                 valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
             }
 
-            // Adiciona desconto para a primeira compra do cliente
-            if (clienteSelecionado != null) {
-                String queryVerificaPrimeiraCompra = "SELECT 1 FROM Transacao WHERE IdCliente = ? LIMIT 1"; // Verifica existência do cliente na tabela Transacao
-                try (PreparedStatement statementVerifica = connection.prepareStatement(queryVerificaPrimeiraCompra)) {
-                    statementVerifica.setInt(1, clienteSelecionado.getIdCliente());
-                    ResultSet rs = statementVerifica.executeQuery();
-                    if (!rs.next()) { // Se não encontrar nenhum registro, é a primeira compra
-                        // Aplica um desconto de 15% na primeira compra
-                        double descontoPrimeiraCompra = 15.0;
-                        valorTotalTransacao -= valorTotalTransacao * (descontoPrimeiraCompra / 100);
-                        mostrarAlerta("Desconto", "Desconto de 15% aplicado por ser a primeira compra do cliente!", Alert.AlertType.INFORMATION);
-                    }
-                } catch (SQLException e) {
-                    mostrarAlerta("Erro", "Falha ao verificar a primeira compra: " + e.getMessage(), Alert.AlertType.ERROR);
-                    e.printStackTrace();
-                }
-            }
-
-
-
             // Atualiza pontos do cliente se ele for cadastrado
             if (clienteSelecionado != null) {
                 double pontosAcumulados = (valorTotalTransacao / 10) * 4; // Exemplo: 5 pontos a cada 10 reais
@@ -296,13 +298,36 @@ public class TransacaoController {
             // Limpa os dados após a transação
             resumoTransacao.clear();
             tvResumo.refresh();
+            // Limpa o valor total após a transação e atualiza o label de preço total
+            valorTotal = 0.0;  // Resetando o preço total
+            lblPrecoTotal.setText("Preço Total: R$ 0,00"); // Atualiza o texto do label
+            // Limpa os ComboBoxes após a transação
 
             // Mensagem de sucesso
             mostrarAlerta("Sucesso", "Transação concluída com sucesso! Valor total: " + valorTotalTransacao, Alert.AlertType.INFORMATION);
+            recarregarTela();
+
 
         } catch (SQLException e) {
             mostrarAlerta("Erro", "Falha ao processar a transação: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
+        }
+    }
+
+    private void recarregarTela() {
+        try {
+            // Obter o stage atual
+            Stage stage = (Stage) tvResumo.getScene().getWindow();
+
+            // Carregar a tela novamente (mesma cena)
+            Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/transacao/transacao.fxml"));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);  // Substitui a cena atual
+            stage.setFullScreen(true);
+            stage.setTitle("Nova Transação");  // Opcional: Modificar o título, se necessário
+            stage.show();  // Mostra a nova cena
+        } catch (IOException e) {
+            mostrarAlerta("Erro", "Falha ao recarregar a tela: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
