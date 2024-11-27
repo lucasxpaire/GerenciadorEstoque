@@ -84,9 +84,7 @@ public class TransacaoController {
         colProduto.setStyle("-fx-alignment: center;");
         colQuantidade.setStyle("-fx-alignment: center;");
         colPreco.setStyle("-fx-alignment: center;");
-
-
-
+        cbDesconto.setValue("Nenhum Desconto");
     }
 
 
@@ -189,7 +187,7 @@ public class TransacaoController {
         }
 
         Cliente clienteSelecionado = cbCliente.getValue(); // Cliente pode ser nulo (opcional)
-        double valorTotalTransacao = 0.0; // Para calcular o valor total da transação antes de aplicar descontos
+        double valorTotalTransacao = valorTotal; // Usa o valor acumulado inicial
 
         try (Connection connection = Database.getConnection()) {
             // Processa cada item da transação
@@ -243,47 +241,55 @@ public class TransacaoController {
                     statement.setInt(6, item.getQuantidade());
                     statement.setString(7, "Venda");
                     statement.executeUpdate();
-
-                    // Acumula o valor total para o cliente
-                    valorTotalTransacao += item.getPrecoTotal();
                 }
             }
 
-            // Verifica e aplica o desconto de fidelidade, se o cliente for cadastrado
+            // Verifica e aplica desconto, se selecionado
+            String descontoSelecionado = cbDesconto.getValue();
+            if (descontoSelecionado != null && !descontoSelecionado.isEmpty()) {
+                double percentualDesconto = 0.0;
+                switch (descontoSelecionado) {
+                    case "5% de Desconto":
+                        percentualDesconto = 5.0;
+                        break;
+                    case "10% de Desconto":
+                        percentualDesconto = 10.0;
+                        break;
+                    case "20% de Desconto":
+                        percentualDesconto = 20.0;
+                        break;
+                }
+                valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
+            }
+
+            // Adiciona desconto para a primeira compra do cliente
             if (clienteSelecionado != null) {
-                String queryFidelidade = "SELECT * FROM Fidelidade WHERE IdCliente = ?";
-                try (PreparedStatement statementFidelidade = connection.prepareStatement(queryFidelidade)) {
-                    statementFidelidade.setInt(1, clienteSelecionado.getIdCliente());
-                    ResultSet rsFidelidade = statementFidelidade.executeQuery();
-
-                    if (rsFidelidade.next()) {
-                        int pontos = rsFidelidade.getInt("Pontos");
-                        double desconto = 0.0;
-
-                        // Aplica o desconto baseado nos pontos
-                        if (pontos >= 20 && pontos < 50) {
-                            desconto = 5.0;
-                        } else if (pontos >= 50 && pontos < 100) {
-                            desconto = 10.0;
-                        } else if (pontos >= 100) {
-                            desconto = 20.0;
-                        }
-
-                        // Atualiza o valor total da transação com o desconto
-                        valorTotalTransacao -= valorTotalTransacao * (desconto / 100);
-
-                        // Exibe o desconto
-                        lblDesconto.setText("Desconto aplicado: " + desconto + "%");
-
-                        // Atualiza os pontos de fidelidade com base no valor gasto
-                        double pontosAcumulados = valorTotalTransacao / 10; // Exemplo: 1 ponto a cada 10 reais
-                        String updatePontos = "UPDATE Fidelidade SET Pontos = Pontos + ? WHERE IdCliente = ?";
-                        try (PreparedStatement statementUpdatePontos = connection.prepareStatement(updatePontos)) {
-                            statementUpdatePontos.setDouble(1, pontosAcumulados);
-                            statementUpdatePontos.setInt(2, clienteSelecionado.getIdCliente());
-                            statementUpdatePontos.executeUpdate();
-                        }
+                String queryVerificaPrimeiraCompra = "SELECT 1 FROM Transacao WHERE IdCliente = ? LIMIT 1"; // Verifica existência do cliente na tabela Transacao
+                try (PreparedStatement statementVerifica = connection.prepareStatement(queryVerificaPrimeiraCompra)) {
+                    statementVerifica.setInt(1, clienteSelecionado.getIdCliente());
+                    ResultSet rs = statementVerifica.executeQuery();
+                    if (!rs.next()) { // Se não encontrar nenhum registro, é a primeira compra
+                        // Aplica um desconto de 15% na primeira compra
+                        double descontoPrimeiraCompra = 15.0;
+                        valorTotalTransacao -= valorTotalTransacao * (descontoPrimeiraCompra / 100);
+                        mostrarAlerta("Desconto", "Desconto de 15% aplicado por ser a primeira compra do cliente!", Alert.AlertType.INFORMATION);
                     }
+                } catch (SQLException e) {
+                    mostrarAlerta("Erro", "Falha ao verificar a primeira compra: " + e.getMessage(), Alert.AlertType.ERROR);
+                    e.printStackTrace();
+                }
+            }
+
+
+
+            // Atualiza pontos do cliente se ele for cadastrado
+            if (clienteSelecionado != null) {
+                double pontosAcumulados = (valorTotalTransacao / 10) * 4; // Exemplo: 5 pontos a cada 10 reais
+                String updatePontos = "UPDATE Fidelidade SET Pontos = Pontos + ? WHERE IdCliente = ?";
+                try (PreparedStatement statementUpdatePontos = connection.prepareStatement(updatePontos)) {
+                    statementUpdatePontos.setDouble(1, pontosAcumulados);
+                    statementUpdatePontos.setInt(2, clienteSelecionado.getIdCliente());
+                    statementUpdatePontos.executeUpdate();
                 }
             }
 
@@ -342,13 +348,17 @@ public class TransacaoController {
 
                     // Consultar tabela de descontos baseada nos pontos de fidelidade
                     ObservableList<String> descontosDisponiveis = FXCollections.observableArrayList();
+                    descontosDisponiveis.add("Nenhum Desconto"); // Opção padrão sem desconto
                     if (pontos >= 20 && pontos < 50) {
                         descontosDisponiveis.add("5% de Desconto");
                     }
                     if (pontos >= 50 && pontos < 100) {
+                        descontosDisponiveis.add("5% de Desconto");
                         descontosDisponiveis.add("10% de Desconto");
                     }
                     if (pontos >= 100) {
+                        descontosDisponiveis.add("5% de Desconto");
+                        descontosDisponiveis.add("10% de Desconto");
                         descontosDisponiveis.add("20% de Desconto");
                     }
 
@@ -376,6 +386,9 @@ public class TransacaoController {
                                     break;
                                 case "20% de Desconto":
                                     percentualDesconto = 20.0;
+                                    break;
+                                case "Nenhum Desconto":
+                                    percentualDesconto = 0.0; // Sem desconto
                                     break;
                             }
                         }
