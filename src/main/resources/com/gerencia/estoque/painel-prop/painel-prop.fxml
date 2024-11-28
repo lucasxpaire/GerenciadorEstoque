@@ -8,9 +8,11 @@
     <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Painel de Controle do Proprietário" />
 
     <Button onAction="#goToVisaoGeral" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Visão Geral" />
-    <Button onAction="#goToVender" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Transação" />
+    <Button onAction="#goToTransacao" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Transação" />
     <Button onAction="#goToManterEstoque" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Estoque" />
     <Button onAction="#goToRelatorios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Relatórios" />
+    <Button onAction="#goToDescontos" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Descontos" />
+    <Button onAction="#goToClientes" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Clientes" />
     <Button onAction="#goToManterFuncionarios" prefHeight="50.0" prefWidth="300.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Funcionários" />
 
     <Button onAction="#voltar" text="Desconectar" />

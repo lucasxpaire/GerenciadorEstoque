@@ -15,8 +15,8 @@ module com.gerencia.estoque {
     exports com.gerencia.estoque.controller.relatorio;
     opens com.gerencia.estoque.controller.relatorio to javafx.fxml;
 
-    exports com.gerencia.estoque.controller.vender;
-    opens com.gerencia.estoque.controller.vender to javafx.fxml;
+    exports com.gerencia.estoque.controller.descontos;
+    opens com.gerencia.estoque.controller.descontos to javafx.fxml;
 
     exports com.gerencia.estoque.controller.estoque;
     opens com.gerencia.estoque.controller.estoque to javafx.fxml;
@@ -31,6 +31,9 @@ module com.gerencia.estoque {
     exports com.gerencia.estoque.controller.transacao;
     opens com.gerencia.estoque.controller.transacao to javafx.fxml;
 
+    exports com.gerencia.estoque.controller.clientes;
+    opens com.gerencia.estoque.controller.clientes to javafx.fxml;
+
     // Modelos
     exports com.gerencia.estoque.model.funcionarios;
     opens com.gerencia.estoque.model.funcionarios to javafx.fxml;
@@ -40,4 +43,11 @@ module com.gerencia.estoque {
 
     exports com.gerencia.estoque.model.transacao;
     opens com.gerencia.estoque.model.transacao to javafx.base;
+
+    exports com.gerencia.estoque.model.desconto;
+    opens com.gerencia.estoque.model.desconto to javafx.base;
+
+    exports com.gerencia.estoque.model.clientes;
+    opens com.gerencia.estoque.model.clientes to javafx.base;
+
 }

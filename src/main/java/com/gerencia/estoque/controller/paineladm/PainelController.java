@@ -31,9 +31,20 @@ public class PainelController {
         carregarTela("/com/gerencia/estoque/estoque/estoque.fxml", "Estoque", event);
     }
     @FXML
-    public void goToVender(ActionEvent event) {
+    public void goToTransacao(ActionEvent event) {
         carregarTela("/com/gerencia/estoque/transacao/transacao.fxml", "Vender Produto", event);
     }
+
+    @FXML
+    public void goToDescontos(ActionEvent event){
+        carregarTela("/com/gerencia/estoque/painel-prop/descontos.fxml", "Descontos", event);
+    }
+
+    @FXML
+    public void goToClientes(ActionEvent event){
+        carregarTela("/com/gerencia/estoque/painel-prop/manter-clientes.fxml", "Clientes", event);
+    }
+
 
     @FXML
     public void voltar(ActionEvent event) {

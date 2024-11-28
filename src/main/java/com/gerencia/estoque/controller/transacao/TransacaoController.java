@@ -89,7 +89,6 @@ public class TransacaoController {
 
     }
 
-
     private void carregarFuncionarios() {
         try (Connection connection = Database.getConnection()) {
             String query = "SELECT IdFuncionario, Nome FROM Funcionario";
@@ -107,7 +106,6 @@ public class TransacaoController {
             mostrarAlerta("Erro", "Erro ao carregar funcionários: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-
 
     private void carregarProdutos() {
         try (Connection connection = Database.getConnection()) {
@@ -149,7 +147,6 @@ public class TransacaoController {
         }
     }
 
-
     @FXML
     private void adicionarItem(ActionEvent event) {
         Produto produtoSelecionado = cbProduto.getValue();
@@ -177,7 +174,6 @@ public class TransacaoController {
             mostrarAlerta("Erro", "Selecione um produto e informe a quantidade.", Alert.AlertType.ERROR);
         }
     }
-
 
     @FXML
     private void handleConfirmarTransacao() {
@@ -207,7 +203,7 @@ public class TransacaoController {
             }
 
             // Aplica o desconto de 15% se for a primeira compra
-            if (primeiraCompra) {
+            if (primeiraCompra && clienteSelecionado != null) {
                 valorTotalTransacao *= 0.85;  // Aplica o desconto de 15%
                 mostrarAlerta("Desconto Aplicado", "Foi aplicado um cupom de 15% de desconto por ser a primeira compra do cliente.", Alert.AlertType.INFORMATION);
             }
@@ -448,12 +444,10 @@ public class TransacaoController {
         return total - (total * (percentualDesconto / 100));
     }
 
-
     private void atualizarValorTotal(double total) {
         // Atualiza o texto da label com o valor total formatado
         lblPrecoTotal.setText("Valor Total: R$ " + String.format("%.2f", total));
     }
-
 
     @FXML
     public void voltar(ActionEvent event) {

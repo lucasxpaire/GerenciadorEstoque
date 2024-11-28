@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.transacao.AdicionarDescontoController">
+
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Cadastro de Desconto" />
+
+    <!-- Campo para Tipo de Desconto -->
+    <HBox alignment="CENTER" spacing="10">
+        <Label prefHeight="17.0" prefWidth="102.0" text="Tipo de Desconto:" />
+        <TextField fx:id="tfTipo" prefHeight="25.0" prefWidth="185.0" promptText="Ex: Primeira Compra, Fidelidade" />
+    </HBox>
+
+    <!-- Campo para Percentual de Desconto -->
+    <HBox alignment="CENTER" spacing="10">
+        <Label prefHeight="17.0" prefWidth="136.0" text="Percentual de Desconto:" />
+        <TextField fx:id="tfPercentual" prefHeight="25.0" prefWidth="149.0" promptText="Ex: 10, 20, 50" />
+    </HBox>
+
+    <!-- Campo para Descrição do Desconto -->
+    <HBox alignment="CENTER" spacing="10">
+        <Label text="Descrição do Desconto:" />
+        <TextField fx:id="tfDescricao" prefHeight="25.0" prefWidth="162.0" promptText="Descreva o desconto" />
+    </HBox>
+
+    <!-- Botão para Salvar o Desconto -->
+    <HBox alignment="CENTER" spacing="10">
+        <Button onAction="#handleSalvarDesconto" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Salvar Desconto" />
+    </HBox>
+
+</VBox>
