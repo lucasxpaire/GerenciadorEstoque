@@ -28,6 +28,8 @@ public class ManterDescontosController {
     private TextField campoPercentual;
     @FXML
     private TextField campoDescricao;
+    @FXML
+    private TextField campoPontosMinimos; // Novo campo para pontos mínimos do desconto
 
     @FXML
     private TableView<Desconto> tableDescontos;
@@ -37,6 +39,9 @@ public class ManterDescontosController {
     private TableColumn<Desconto, String> colunaPercentual;
     @FXML
     private TableColumn<Desconto, String> colunaDescricao;
+    @FXML
+    private TableColumn<Desconto, Integer> colunaPontosMinimos;
+
 
     private ObservableList<Desconto> listaDescontos;
 
@@ -46,10 +51,15 @@ public class ManterDescontosController {
 
         colunaTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         colunaTipo.setStyle("-fx-alignment: CENTER;");
+
         colunaPercentual.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPercentual() + "%"));
         colunaPercentual.setStyle("-fx-alignment: CENTER;");
+
         colunaDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
         colunaDescricao.setStyle("-fx-alignment: CENTER;");
+        // Atualizando para tratar corretamente a coluna de pontos mínimos
+        colunaPontosMinimos.setCellValueFactory(param -> param.getValue().pontosMinimosProperty().asObject());
+        colunaPontosMinimos.setStyle("-fx-alignment: CENTER;");
 
         tableDescontos.setItems(listaDescontos);
         carregarDescontos();
@@ -60,9 +70,12 @@ public class ManterDescontosController {
                 campoTipo.setText(descontoSelecionado.getTipo());
                 campoPercentual.setText(String.valueOf(descontoSelecionado.getPercentual()));
                 campoDescricao.setText(descontoSelecionado.getDescricao());
+                campoPontosMinimos.setText(String.valueOf(descontoSelecionado.getPontosMinimos()));
+
             }
         });
     }
+
 
     private void carregarDescontos() {
         listaDescontos.clear();
@@ -75,7 +88,8 @@ public class ManterDescontosController {
                         rs.getInt("IdDesconto"),
                         rs.getString("Tipo"),
                         rs.getDouble("Percentual"),
-                        rs.getString("Descricao")
+                        rs.getString("Descricao"),
+                        rs.getInt("PontosMinimos") // Novo campo
                 );
                 listaDescontos.add(desconto);
             }
@@ -84,36 +98,42 @@ public class ManterDescontosController {
         }
     }
 
+
     @FXML
     public void adicionarDesconto() {
         String tipo = campoTipo.getText();
         String percentualTexto = campoPercentual.getText();
         String descricao = campoDescricao.getText();
+        String pontosTexto = campoPontosMinimos.getText(); // Novo campo
 
-        if (tipo.isEmpty() || percentualTexto.isEmpty()) {
-            mostrarAlerta("Erro", "Os campos 'Tipo' e 'Percentual' são obrigatórios.", Alert.AlertType.WARNING);
+        if (tipo.isEmpty() || percentualTexto.isEmpty() || pontosTexto.isEmpty()) {
+            mostrarAlerta("Erro", "Os campos 'Tipo', 'Percentual' e 'Pontos Mínimos' são obrigatórios.", Alert.AlertType.WARNING);
             return;
         }
 
         try {
             double percentual = Double.parseDouble(percentualTexto);
-            String sql = "INSERT INTO Desconto (Tipo, Percentual, Descricao) VALUES (?, ?, ?)";
+            int pontosMinimos = Integer.parseInt(pontosTexto);
+
+            String sql = "INSERT INTO Desconto (Tipo, Percentual, Descricao, PontosMinimos) VALUES (?, ?, ?, ?)";
             try (Connection conn = Database.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, tipo);
                 stmt.setDouble(2, percentual);
                 stmt.setString(3, descricao);
+                stmt.setInt(4, pontosMinimos); // Novo campo
                 stmt.executeUpdate();
                 mostrarAlerta("Sucesso", "Desconto adicionado com sucesso.", Alert.AlertType.INFORMATION);
                 carregarDescontos();
                 limparCampos();
             }
         } catch (NumberFormatException e) {
-            mostrarAlerta("Erro", "O campo 'Percentual' deve ser um número.", Alert.AlertType.WARNING);
+            mostrarAlerta("Erro", "Os campos 'Percentual' e 'Pontos Mínimos' devem ser números.", Alert.AlertType.WARNING);
         } catch (SQLException e) {
             mostrarAlerta("Erro", "Erro ao adicionar desconto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
+
 
     @FXML
     public void editarDesconto() {
@@ -126,33 +146,36 @@ public class ManterDescontosController {
         String tipo = campoTipo.getText();
         String percentualTexto = campoPercentual.getText();
         String descricao = campoDescricao.getText();
+        String pontosTexto = campoPontosMinimos.getText(); // Novo campo
 
-        if (tipo.isEmpty() || percentualTexto.isEmpty()) {
-            mostrarAlerta("Erro", "Os campos 'Tipo' e 'Percentual' são obrigatórios.", Alert.AlertType.WARNING);
+        if (tipo.isEmpty() || percentualTexto.isEmpty() || pontosTexto.isEmpty()) {
+            mostrarAlerta("Erro", "Os campos 'Tipo', 'Percentual' e 'Pontos Mínimos' são obrigatórios.", Alert.AlertType.WARNING);
             return;
         }
 
         try {
             double percentual = Double.parseDouble(percentualTexto);
-            String sql = "UPDATE Desconto SET Tipo = ?, Percentual = ?, Descricao = ? WHERE IdDesconto = ?";
+            int pontosMinimos = Integer.parseInt(pontosTexto);
+
+            String sql = "UPDATE Desconto SET Tipo = ?, Percentual = ?, Descricao = ?, PontosMinimos = ? WHERE IdDesconto = ?";
             try (Connection conn = Database.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, tipo);
                 stmt.setDouble(2, percentual);
                 stmt.setString(3, descricao);
-                stmt.setInt(4, descontoSelecionado.getIdDesconto());
+                stmt.setInt(4, pontosMinimos); // Novo campo
+                stmt.setInt(5, descontoSelecionado.getIdDesconto());
                 stmt.executeUpdate();
                 mostrarAlerta("Sucesso", "Desconto editado com sucesso.", Alert.AlertType.INFORMATION);
                 carregarDescontos();
                 limparCampos();
             }
         } catch (NumberFormatException e) {
-            mostrarAlerta("Erro", "O campo 'Percentual' deve ser um número.", Alert.AlertType.WARNING);
+            mostrarAlerta("Erro", "Os campos 'Percentual' e 'Pontos Mínimos' devem ser números.", Alert.AlertType.WARNING);
         } catch (SQLException e) {
             mostrarAlerta("Erro", "Erro ao editar desconto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-
     @FXML
     public void removerDesconto() {
         Desconto descontoSelecionado = tableDescontos.getSelectionModel().getSelectedItem();
@@ -211,5 +234,6 @@ public class ManterDescontosController {
         campoTipo.clear();
         campoPercentual.clear();
         campoDescricao.clear();
+        campoPontosMinimos.clear(); // Limpa o campo de pontos mínimos
     }
 }

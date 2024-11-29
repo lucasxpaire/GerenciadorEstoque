@@ -21,6 +21,7 @@
                     <TableColumn fx:id="colunaTipo" prefWidth="211.0" style="-fx-alignment: CENTER-LEFT;" text="Tipo" />
                     <TableColumn fx:id="colunaPercentual" prefWidth="155.0" style="-fx-alignment: CENTER-LEFT;" text="Percentual (%)" />
                     <TableColumn fx:id="colunaDescricao" prefWidth="222.0" style="-fx-alignment: CENTER-LEFT;" text="Descrição" />
+                    <TableColumn fx:id="colunaPontosMinimos" prefWidth="222.0" style="-fx-alignment: CENTER-LEFT;" text="Pontuação Mínima" />
                 </columns>
             <columnResizePolicy>
                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -34,6 +35,7 @@
         <TextField fx:id="campoTipo" prefHeight="27.0" prefWidth="433.0" promptText="Tipo de Desconto" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
         <TextField fx:id="campoPercentual" prefHeight="27.0" prefWidth="414.0" promptText="Percentual (%)" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
         <TextField fx:id="campoDescricao" promptText="Descrição" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
+        <TextField fx:id="campoPontosMinimos" promptText="Pontuação Mínima" style="-fx-pref-width: 400; -fx-background-color: #ffffff; -fx-border-color: #000000;" />
     </VBox>
 
     <!-- Botões centralizados -->

@@ -5,6 +5,7 @@ import com.gerencia.estoque.model.transacao.Cliente;
 import com.gerencia.estoque.model.transacao.Funcionario;
 import com.gerencia.estoque.model.transacao.ItemResumo;
 import com.gerencia.estoque.model.transacao.Produto;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,48 +25,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TransacaoController {
-
     @FXML
     private ComboBox<Produto> cbProduto;
-
     @FXML
     private TextField tfQuantidade;
-
     @FXML
     private ComboBox<Cliente> cbCliente;
-
     @FXML
     private TableView<ItemResumo> tvResumo;
-
     @FXML
     private TableColumn<ItemResumo, String> colProduto;
-
     @FXML
     private TableColumn<ItemResumo, String> colQuantidade;
-
     @FXML
     private TableColumn<ItemResumo, String> colPreco;
-
     private ObservableList<Produto> listaProdutos = FXCollections.observableArrayList();
     private ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
     private ObservableList<ItemResumo> resumoTransacao = FXCollections.observableArrayList();
-
     @FXML
     private ComboBox<Funcionario> cbFuncionario;
-
     private ObservableList<Funcionario> listaFuncionarios = FXCollections.observableArrayList();
-
     @FXML
     private Label lblPontos;
     @FXML
     private Label lblDesconto;
-
     @FXML
     private Label lblPrecoTotal;
-
-    private Cliente clienteSelecionado;
     private double valorTotal = 0.0;
-
     @FXML
     private ComboBox<String> cbDesconto;
 
@@ -74,19 +60,15 @@ public class TransacaoController {
         carregarProdutos();
         carregarClientes();
         carregarFuncionarios();  // Carregar os funcionários
-
         // Configuração da tabela de resumo
         colProduto.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescricao()));
         colQuantidade.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(String.valueOf(cellData.getValue().getQuantidade())));
         colPreco.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(String.valueOf(cellData.getValue().getPrecoTotal())));
-
         // Centralizar as colunas na tabela
         colProduto.setStyle("-fx-alignment: center;");
         colQuantidade.setStyle("-fx-alignment: center;");
         colPreco.setStyle("-fx-alignment: center;");
         cbDesconto.setValue("Nenhum Desconto");
-
-
     }
 
     private void carregarFuncionarios() {
@@ -177,132 +159,65 @@ public class TransacaoController {
 
     @FXML
     private void handleConfirmarTransacao() {
-
-        Funcionario funcionarioSelecionado = cbFuncionario.getValue(); // Obter o funcionário selecionado
-
+        Funcionario funcionarioSelecionado = cbFuncionario.getValue();
         if (funcionarioSelecionado == null || resumoTransacao.isEmpty()) {
             mostrarAlerta("Erro", "Selecione um funcionário e adicione produtos à transação.", Alert.AlertType.ERROR);
             return;
         }
 
-        Cliente clienteSelecionado = cbCliente.getValue(); // Cliente pode ser nulo (opcional)
-        double valorTotalTransacao = valorTotal; // Usa o valor acumulado inicial
+        Cliente clienteSelecionado = cbCliente.getValue();
+        double valorTotalTransacao = valorTotal; // Base inicial para o cálculo.
 
         try (Connection connection = Database.getConnection()) {
-            // Verifica se é a primeira compra do cliente
-            boolean primeiraCompra = true;
-            if (clienteSelecionado != null) {
-                String queryVerificaPrimeiraCompra = "SELECT COUNT(*) FROM Transacao WHERE IdCliente = ?";
-                try (PreparedStatement statementVerifica = connection.prepareStatement(queryVerificaPrimeiraCompra)) {
-                    statementVerifica.setInt(1, clienteSelecionado.getIdCliente());
-                    ResultSet rsVerifica = statementVerifica.executeQuery();
-                    if (rsVerifica.next() && rsVerifica.getInt(1) > 0) {
-                        primeiraCompra = false;
-                    }
-                }
+            // Aplica descontos com base no desconto selecionado
+            String descontoSelecionado = cbDesconto.getValue();
+            double percentualDesconto = 0.0;
+
+            if (descontoSelecionado != null) {
+                // Extrai o percentual de desconto da string usando o método de conversão
+                percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+
+                // Aplica o desconto ao valor total da transação
+                valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
             }
 
-            // Aplica o desconto de 15% se for a primeira compra
-            if (primeiraCompra && clienteSelecionado != null) {
-                valorTotalTransacao *= 0.85;  // Aplica o desconto de 15%
+            // Aplica desconto de 15% para a primeira compra, se aplicável
+            if (clienteSelecionado != null && isPrimeiraCompra(connection, clienteSelecionado)) {
+                valorTotalTransacao *= 0.85; // Aplica o desconto de 15% para primeira compra
                 mostrarAlerta("Desconto Aplicado", "Foi aplicado um cupom de 15% de desconto por ser a primeira compra do cliente.", Alert.AlertType.INFORMATION);
             }
 
-            // Processa cada item da transação
+            // Atualiza o rótulo de preço total
+            atualizarValorTotal(valorTotalTransacao);
+
+            // Processa os itens da transação
             for (ItemResumo item : resumoTransacao) {
                 Produto produtoSelecionado = listaProdutos.stream()
                         .filter(p -> p.getDescricao().equals(item.getDescricao()))
                         .findFirst()
                         .orElse(null);
 
-                if (produtoSelecionado == null) {
-                    continue;
-                }
+                if (produtoSelecionado == null) continue;
 
-                // Verifica se há estoque suficiente
-                String queryEstoque = "SELECT Quantidade FROM Estoque WHERE IdProduto = ?";
-                try (PreparedStatement statementEstoque = connection.prepareStatement(queryEstoque)) {
-                    statementEstoque.setInt(1, produtoSelecionado.getIdProduto());
-                    ResultSet rsEstoque = statementEstoque.executeQuery();
-                    if (rsEstoque.next()) {
-                        int estoqueAtual = rsEstoque.getInt("Quantidade");
-                        if (estoqueAtual < item.getQuantidade()) {
-                            mostrarAlerta("Erro", "Quantidade insuficiente de " + item.getDescricao() + " no estoque.", Alert.AlertType.ERROR);
-                            return;
-                        }
-                    }
-                }
+                if (!verificarEstoque(connection, produtoSelecionado, item)) return;
 
-                // Atualiza o estoque após a venda
-                String queryUpdateEstoque = "UPDATE Estoque SET Quantidade = Quantidade - ? WHERE IdProduto = ?";
-                try (PreparedStatement statementUpdateEstoque = connection.prepareStatement(queryUpdateEstoque)) {
-                    statementUpdateEstoque.setInt(1, item.getQuantidade());
-                    statementUpdateEstoque.setInt(2, produtoSelecionado.getIdProduto());
-                    statementUpdateEstoque.executeUpdate();
-                }
+                atualizarEstoque(connection, produtoSelecionado, item);
 
-                // Adicionar transação
-                String query = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, Tipo) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setInt(1, produtoSelecionado.getIdProduto());
-                    statement.setInt(2, funcionarioSelecionado.getIdFuncionario());
-
-                    // Define o ID do cliente ou NULL
-                    if (clienteSelecionado != null) {
-                        statement.setInt(3, clienteSelecionado.getIdCliente());
-                    } else {
-                        statement.setNull(3, java.sql.Types.INTEGER);
-                    }
-
-                    statement.setDouble(4, item.getPrecoTotal());
-                    statement.setString(5, item.getDescricao());
-                    statement.setInt(6, item.getQuantidade());
-                    statement.setString(7, "Venda");
-                    statement.executeUpdate();
-                }
+                // Adicionar transação com valor ajustado
+                adicionarTransacao(connection, produtoSelecionado, funcionarioSelecionado, clienteSelecionado,
+                        new ItemResumo(item.getDescricao(), item.getQuantidade(), valorTotalTransacao));
             }
 
-            // Verifica e aplica desconto adicional, se selecionado
-            String descontoSelecionado = cbDesconto.getValue();
-            if (descontoSelecionado != null && !descontoSelecionado.isEmpty()) {
-                double percentualDesconto = 0.0;
-                switch (descontoSelecionado) {
-                    case "5% de Desconto":
-                        percentualDesconto = 5.0;
-                        break;
-                    case "10% de Desconto":
-                        percentualDesconto = 10.0;
-                        break;
-                    case "20% de Desconto":
-                        percentualDesconto = 20.0;
-                        break;
-                }
-                valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
-            }
-
-            // Atualiza pontos do cliente se ele for cadastrado
+            // Atualizar pontos de fidelidade, se necessário
             if (clienteSelecionado != null) {
-                double pontosAcumulados = (valorTotalTransacao / 10) * 4; // Exemplo: 5 pontos a cada 10 reais
-                String updatePontos = "UPDATE Fidelidade SET Pontos = Pontos + ? WHERE IdCliente = ?";
-                try (PreparedStatement statementUpdatePontos = connection.prepareStatement(updatePontos)) {
-                    statementUpdatePontos.setDouble(1, pontosAcumulados);
-                    statementUpdatePontos.setInt(2, clienteSelecionado.getIdCliente());
-                    statementUpdatePontos.executeUpdate();
-                }
+                double pontosAcumulados = (valorTotalTransacao / 10) * 4; // Exemplo de cálculo de pontos
+                atualizarPontosFidelidade(connection, clienteSelecionado, pontosAcumulados);
             }
 
-            // Limpa os dados após a transação
-            resumoTransacao.clear();
-            tvResumo.refresh();
-            // Limpa o valor total após a transação e atualiza o label de preço total
-            valorTotal = 0.0;  // Resetando o preço total
-            lblPrecoTotal.setText("Preço Total: R$ 0,00"); // Atualiza o texto do label
-            // Limpa os ComboBoxes após a transação
+            finalizarTransacao();
 
-            // Mensagem de sucesso
-            mostrarAlerta("Sucesso", "Transação concluída com sucesso! Valor total: " + valorTotalTransacao, Alert.AlertType.INFORMATION);
+            mostrarAlerta("Sucesso", String.format("Transação concluída com sucesso! Valor total: R$ %.2f", valorTotalTransacao), Alert.AlertType.INFORMATION);
             recarregarTela();
-
 
         } catch (SQLException e) {
             mostrarAlerta("Erro", "Falha ao processar a transação: " + e.getMessage(), Alert.AlertType.ERROR);
@@ -310,11 +225,208 @@ public class TransacaoController {
         }
     }
 
+    private double obterPercentualDesconto(String descontoSelecionado) {
+        double percentualDesconto = 0.0;
+        if (descontoSelecionado != null) {
+            // Verificar se o desconto contém números
+            if (!descontoSelecionado.matches(".*\\d.*")) { // Regex para verificar se contém dígitos
+                return 0.0; // Sem desconto
+            }
+
+            // Remover o texto extra após o percentual
+            String[] partes = descontoSelecionado.split(" - ");
+            if (partes.length > 0) {
+                // Pega a primeira parte antes do " - ", que contém o valor do percentual
+                String percentualString = partes[0].replace("%", "").trim();
+
+                try {
+                    // Substitui vírgulas por ponto, se necessário, e converte para double
+                    percentualString = percentualString.replace(",", ".");
+                    percentualDesconto = Double.parseDouble(percentualString);
+                } catch (NumberFormatException e) {
+                    System.out.println("Erro ao extrair percentual de desconto: " + e.getMessage());
+                }
+            }
+        }
+        return percentualDesconto;
+    }
+    @FXML
+    private void verificarFidelidade() {
+        Cliente clienteSelecionado = cbCliente.getValue();
+        if (clienteSelecionado == null) {
+            mostrarAlerta("Erro", "Selecione um cliente para verificar fidelidade.", Alert.AlertType.ERROR);
+            return;
+        }
+        try (Connection connection = Database.getConnection()) {
+            // Consulta os pontos de fidelidade do cliente
+            String queryFidelidade = "SELECT * FROM Fidelidade WHERE IdCliente = ?";
+            try (PreparedStatement statement = connection.prepareStatement(queryFidelidade)) {
+                statement.setInt(1, clienteSelecionado.getIdCliente());
+                ResultSet rs = statement.executeQuery();
+
+                if (rs.next()) {
+                    int pontos = rs.getInt("Pontos");
+                    lblPontos.setText("Pontos: " + pontos);
+
+                    // Consultar descontos disponíveis para o cliente com base nos pontos
+                    ObservableList<String> descontosDisponiveis = FXCollections.observableArrayList();
+                    descontosDisponiveis.add("Nenhum Desconto"); // Opção padrão sem desconto
+
+                    // Buscar todos os descontos da tabela
+                    String queryDescontos = "SELECT * FROM Desconto ORDER BY PontosMinimos DESC";
+                    try (PreparedStatement statementDesconto = connection.prepareStatement(queryDescontos)) {
+                        ResultSet rsDescontos = statementDesconto.executeQuery();
+
+                        while (rsDescontos.next()) {
+                            int pontosMinimos = rsDescontos.getInt("PontosMinimos");
+                            double percentualDesconto = rsDescontos.getDouble("Percentual");
+                            String descricaoDesconto = rsDescontos.getString("Descricao");
+
+                            // Verifica se o desconto é de "primeira compra"
+                            if (descricaoDesconto.toLowerCase().contains("primeira")) {
+                                // Só adiciona o desconto de "primeira compra" se o cliente não tiver transações
+                                if (isPrimeiraCompra(connection, clienteSelecionado)) {
+                                    descontosDisponiveis.add(String.format("%.2f%% - %s", percentualDesconto, descricaoDesconto));
+                                }
+                            } else if (pontos >= pontosMinimos) {
+                                // Adiciona outros descontos com base nos pontos mínimos
+                                descontosDisponiveis.add(String.format("%.2f%% - %s", percentualDesconto, descricaoDesconto));
+                            }
+                        }
+
+                        // Atualizar o ComboBox com os descontos encontrados
+                        cbDesconto.setItems(descontosDisponiveis);
+                        cbDesconto.setVisible(true); // Torna o ComboBox visível
+
+                        // Caso não haja descontos, ocultar o ComboBox
+                        if (descontosDisponiveis.isEmpty()) {
+                            lblDesconto.setText("Desconto: 0%");
+                            cbDesconto.setVisible(false);
+                        }
+
+                        // Listener para atualizar o valor total quando o desconto for selecionado
+                        cbDesconto.setOnAction(event -> {
+                            String descontoSelecionado = cbDesconto.getValue();
+                            double percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+
+                            // Atualiza o lblDesconto com o desconto selecionado
+                            lblDesconto.setText("Desconto: " + percentualDesconto + "%");
+
+                            // Atualiza o valor total com o desconto
+                            atualizarValorTotalComDesconto(percentualDesconto);
+                        });
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            mostrarAlerta("Erro", "Erro ao verificar fidelidade: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isPrimeiraCompra(Connection connection, Cliente cliente) throws SQLException {
+        // Verificar se o cliente já realizou alguma transação no sistema
+        String query = "SELECT COUNT(*) FROM Transacao WHERE IdCliente = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, cliente.getIdCliente());
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0; // Retorna true se o cliente nunca fez uma transação
+            }
+        }
+        return false; // Caso algo dê errado, assume que não é a primeira compra
+    }
+
+    // Função para verificar estoque
+    private boolean verificarEstoque(Connection connection, Produto produto, ItemResumo item) throws SQLException {
+        String queryEstoque = "SELECT Quantidade FROM Estoque WHERE IdProduto = ?";
+        try (PreparedStatement statementEstoque = connection.prepareStatement(queryEstoque)) {
+            statementEstoque.setInt(1, produto.getIdProduto());
+            ResultSet rsEstoque = statementEstoque.executeQuery();
+            if (rsEstoque.next()) {
+                int estoqueAtual = rsEstoque.getInt("Quantidade");
+                if (estoqueAtual < item.getQuantidade()) {
+                    mostrarAlerta("Erro", "Quantidade insuficiente de " + item.getDescricao() + " no estoque.", Alert.AlertType.ERROR);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Função para atualizar estoque
+    private void atualizarEstoque(Connection connection, Produto produto, ItemResumo item) throws SQLException {
+        String queryUpdateEstoque = "UPDATE Estoque SET Quantidade = Quantidade - ? WHERE IdProduto = ?";
+        try (PreparedStatement statementUpdateEstoque = connection.prepareStatement(queryUpdateEstoque)) {
+            statementUpdateEstoque.setInt(1, item.getQuantidade());
+            statementUpdateEstoque.setInt(2, produto.getIdProduto());
+            statementUpdateEstoque.executeUpdate();
+        }
+    }
+
+    // Função para adicionar transação
+    private void adicionarTransacao(Connection connection, Produto produto, Funcionario funcionario, Cliente cliente, ItemResumo item) throws SQLException {
+        String query = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, Tipo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, produto.getIdProduto());
+            statement.setInt(2, funcionario.getIdFuncionario());
+            if (cliente != null) {
+                statement.setInt(3, cliente.getIdCliente());
+            } else {
+                statement.setNull(3, java.sql.Types.INTEGER);
+            }
+            statement.setDouble(4, item.getPrecoTotal());
+            statement.setString(5, item.getDescricao());
+            statement.setInt(6, item.getQuantidade());
+            statement.setString(7, "Venda");
+            statement.executeUpdate();
+        }
+    }
+
+    // Função para atualizar pontos de fidelidade
+    private void atualizarPontosFidelidade(Connection connection, Cliente cliente, double pontosAcumulados) throws SQLException {
+        String updatePontos = "UPDATE Fidelidade SET Pontos = Pontos + ? WHERE IdCliente = ?";
+        try (PreparedStatement statementUpdatePontos = connection.prepareStatement(updatePontos)) {
+            statementUpdatePontos.setDouble(1, pontosAcumulados);
+            statementUpdatePontos.setInt(2, cliente.getIdCliente());
+            statementUpdatePontos.executeUpdate();
+        }
+    }
+
+    private void finalizarTransacao() {
+        // Limpa os itens da tabela
+        resumoTransacao.clear();
+        tvResumo.refresh();
+
+        // Limpa os campos de entrada
+        tfQuantidade.clear();
+        cbProduto.setValue(null);
+        cbCliente.setValue(null);
+        cbFuncionario.setValue(null);
+        cbDesconto.setValue("Nenhum Desconto");
+
+        // Redefine o valor total
+        valorTotal = 0.0;
+        lblPrecoTotal.setText("Preço Total: R$ 0,00");
+        lblDesconto.setText("Desconto: 0%");
+        lblPontos.setText("Pontos: 0");
+
+        // Se desejar, pode também redefinir o ComboBox de descontos e clientes
+        cbDesconto.setItems(FXCollections.observableArrayList("Nenhum Desconto")); // Resetando os descontos
+
+        // Adiciona o PromptText de volta aos campos de texto
+        tfQuantidade.setPromptText("Digite a quantidade");
+        cbProduto.setPromptText("Selecione um produto");
+        cbCliente.setPromptText("Selecione um cliente");
+        cbFuncionario.setPromptText("Selecione um funcionário");
+    }
+
     private void recarregarTela() {
         try {
             // Obter o stage atual
             Stage stage = (Stage) tvResumo.getScene().getWindow();
-
             // Carregar a tela novamente (mesma cena)
             Parent root = FXMLLoader.load(getClass().getResource("/com/gerencia/estoque/transacao/transacao.fxml"));
             Scene scene = new Scene(root);
@@ -332,7 +444,6 @@ public class TransacaoController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/transacao/CadastroCliente.fxml"));
             Parent root = loader.load();
-
             Stage stage = new Stage();
             stage.setTitle("Cadastro de Cliente");
             stage.setScene(new Scene(root));
@@ -341,98 +452,14 @@ public class TransacaoController {
             Stage ownerStage = (Stage) tvResumo.getScene().getWindow();
             stage.initOwner(ownerStage);
             stage.showAndWait();
-
-
             carregarClientes();
         } catch (IOException e) {
             mostrarAlerta("Erro", "Não foi possível abrir o cadastro de cliente: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    @FXML
-    private void verificarFidelidade() {
-        clienteSelecionado = cbCliente.getValue();
-        if (clienteSelecionado == null) {
-            mostrarAlerta("Erro", "Selecione um cliente para verificar fidelidade.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        try (Connection connection = Database.getConnection()) {
-            String queryFidelidade = "SELECT * FROM Fidelidade WHERE IdCliente = ?";
-            try (PreparedStatement statement = connection.prepareStatement(queryFidelidade)) {
-                statement.setInt(1, clienteSelecionado.getIdCliente());
-                ResultSet rs = statement.executeQuery();
-
-                if (rs.next()) {
-                    int pontos = rs.getInt("Pontos");
-                    lblPontos.setText("Pontos: " + pontos);
-
-                    // Consultar tabela de descontos baseada nos pontos de fidelidade
-                    ObservableList<String> descontosDisponiveis = FXCollections.observableArrayList();
-                    descontosDisponiveis.add("Nenhum Desconto"); // Opção padrão sem desconto
-                    if (pontos >= 20 && pontos < 50) {
-                        descontosDisponiveis.add("5% de Desconto");
-                    }
-                    if (pontos >= 50 && pontos < 100) {
-                        descontosDisponiveis.add("5% de Desconto");
-                        descontosDisponiveis.add("10% de Desconto");
-                    }
-                    if (pontos >= 100) {
-                        descontosDisponiveis.add("5% de Desconto");
-                        descontosDisponiveis.add("10% de Desconto");
-                        descontosDisponiveis.add("20% de Desconto");
-                    }
-
-                    // Adiciona os descontos ao ComboBox
-                    cbDesconto.setItems(descontosDisponiveis);
-                    cbDesconto.setVisible(true); // Torna o ComboBox visível
-
-                    // Se nenhum desconto for aplicável
-                    if (descontosDisponiveis.isEmpty()) {
-                        lblDesconto.setText("Desconto: 0%");
-                        cbDesconto.setVisible(false); // Oculta o ComboBox se não houver descontos
-                    }
-
-                    // Listener para atualizar o valor total quando o desconto for selecionado
-                    cbDesconto.setOnAction(event -> {
-                        String descontoSelecionado = cbDesconto.getValue();
-                        double percentualDesconto = 0.0;
-                        if (descontoSelecionado != null) {
-                            switch (descontoSelecionado) {
-                                case "5% de Desconto":
-                                    percentualDesconto = 5.0;
-                                    break;
-                                case "10% de Desconto":
-                                    percentualDesconto = 10.0;
-                                    break;
-                                case "20% de Desconto":
-                                    percentualDesconto = 20.0;
-                                    break;
-                                case "Nenhum Desconto":
-                                    percentualDesconto = 0.0; // Sem desconto
-                                    break;
-                            }
-                        }
-
-                        // Atualiza o lblDesconto com o desconto selecionado
-                        lblDesconto.setText("Desconto: " + percentualDesconto + "%");
-
-                        // Atualiza o valor total com o desconto
-                        atualizarValorTotalComDesconto(percentualDesconto);
-                    });
-                }
-            }
-        } catch (SQLException e) {
-            mostrarAlerta("Erro", "Erro ao verificar fidelidade: " + e.getMessage(), Alert.AlertType.ERROR);
-            e.printStackTrace();
-        }
-    }
-
     private void atualizarValorTotalComDesconto(double percentualDesconto) {
-        // Calcula o valor total com desconto
         double valorComDesconto = calcularTotalComDesconto(percentualDesconto);
-
-        // Atualiza o texto da label com o novo valor total
         lblPrecoTotal.setText("Valor Total: R$ " + String.format("%.2f", valorComDesconto));
     }
 
@@ -445,7 +472,6 @@ public class TransacaoController {
     }
 
     private void atualizarValorTotal(double total) {
-        // Atualiza o texto da label com o valor total formatado
         lblPrecoTotal.setText("Valor Total: R$ " + String.format("%.2f", total));
     }
 
@@ -478,18 +504,11 @@ public class TransacaoController {
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
-
         // Obtém a janela principal para centralizar o alerta
         Stage stage = (Stage) tvResumo.getScene().getWindow();
         alert.initOwner(stage);
         alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-
-        // Maximiza a janela principal para garantir que o alerta esteja visível
-        //stage.setMaximized(true);
-
         // Exibe o alerta
         alert.showAndWait();
     }
-
-
 }

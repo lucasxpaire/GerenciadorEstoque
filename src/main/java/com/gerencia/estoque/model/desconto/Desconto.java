@@ -1,65 +1,90 @@
 package com.gerencia.estoque.model.desconto;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
+
 public class Desconto {
 
-    private int idDesconto;
-    private String tipo;
-    private double percentual;
-    private String descricao;
+    private IntegerProperty idDesconto;
+    private StringProperty tipo;
+    private DoubleProperty percentual;
+    private StringProperty descricao;
+    //private IntegerProperty pontosMinimos;
 
-    // Construtor padrão
-    public Desconto() {
-    }
+    private IntegerProperty pontosMinimos = new SimpleIntegerProperty();
 
-    // Construtor com parâmetros
-    public Desconto(int idDesconto, String tipo, double percentual, String descricao) {
-        this.idDesconto = idDesconto;
-        this.tipo = tipo;
-        this.percentual = percentual;
-        this.descricao = descricao;
+
+    // Construtor
+    public Desconto(int idDesconto, String tipo, double percentual, String descricao, int pontosMinimos) {
+        this.idDesconto = new SimpleIntegerProperty(idDesconto);
+        this.tipo = new SimpleStringProperty(tipo);
+        this.percentual = new SimpleDoubleProperty(percentual);
+        this.descricao = new SimpleStringProperty(descricao);
+        this.pontosMinimos = new SimpleIntegerProperty(pontosMinimos);
     }
 
     // Getters e Setters
     public int getIdDesconto() {
-        return idDesconto;
+        return idDesconto.get();
     }
 
     public void setIdDesconto(int idDesconto) {
-        this.idDesconto = idDesconto;
+        this.idDesconto.set(idDesconto);
+    }
+
+    public IntegerProperty idDescontoProperty() {
+        return idDesconto;
     }
 
     public String getTipo() {
-        return tipo;
+        return tipo.get();
     }
 
     public void setTipo(String tipo) {
-        this.tipo = tipo;
+        this.tipo.set(tipo);
+    }
+
+    public StringProperty tipoProperty() {
+        return tipo;
     }
 
     public double getPercentual() {
-        return percentual;
+        return percentual.get();
     }
 
     public void setPercentual(double percentual) {
-        this.percentual = percentual;
+        this.percentual.set(percentual);
+    }
+
+    public DoubleProperty percentualProperty() {
+        return percentual;
     }
 
     public String getDescricao() {
-        return descricao;
+        return descricao.get();
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao.set(descricao);
     }
 
-    // Método toString para exibição personalizada (opcional)
-    @Override
-    public String toString() {
-        return "Desconto{" +
-                "idDesconto=" + idDesconto +
-                ", tipo='" + tipo + '\'' +
-                ", percentual=" + percentual +
-                ", descricao='" + descricao + '\'' +
-                '}';
+    public StringProperty descricaoProperty() {
+        return descricao;
+    }
+
+    public int getPontosMinimos() {
+        return pontosMinimos.get();
+    }
+
+    public void setPontosMinimos(int pontosMinimos) {
+        this.pontosMinimos.set(pontosMinimos);
+    }
+
+    public IntegerProperty pontosMinimosProperty() {
+        return pontosMinimos;
     }
 }
