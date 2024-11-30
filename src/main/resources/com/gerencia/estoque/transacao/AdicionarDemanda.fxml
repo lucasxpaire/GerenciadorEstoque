@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.transacao.AdicionarDemandaController">
+
+    <!-- Título da Tela -->
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Adicionar Demanda" />
+
+    <!-- Campo para Descrição do Produto -->
+    <TextField fx:id="tfDescricaoProduto" promptText="Descrição do Produto" prefHeight="30" prefWidth="250" />
+
+    <!-- Botão para Adicionar -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button onAction="#handleSalvarDemanda" text="Salvar Demanda" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+        <Button onAction="#handleCancelar" text="Cancelar" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" />
+    </HBox>
+
+    <!-- Mensagem de Status -->
+    <Label fx:id="lblMensagem" style="-fx-text-fill: red; -fx-font-size: 14px;" text="" />
+</VBox>

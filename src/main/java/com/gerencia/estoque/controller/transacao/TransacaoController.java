@@ -544,6 +544,45 @@ public class TransacaoController {
         }
     }
 
+    @FXML
+    private void adicionarDemanda() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/transacao/AdicionarDemanda.fxml"));
+            Parent root = loader.load();
+
+            AdicionarDemandaController controller = loader.getController();
+
+            // Obtem o ID do cliente selecionado no ComboBox
+            Integer idClienteSelecionado = obterIdClienteSelecionado();
+            if (idClienteSelecionado == null) {
+                mostrarAlerta("Aviso", "Por favor, selecione um cliente para adicionar a demanda.", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // Define o ID do cliente no controlador
+            controller.setIdCliente(idClienteSelecionado);
+
+            Stage stage = new Stage();
+            stage.setTitle("Adicionar Demanda");
+            stage.setScene(new Scene(root));
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.initOwner(tvResumo.getScene().getWindow());
+            stage.showAndWait();
+        } catch (IOException e) {
+            mostrarAlerta("Erro", "Não foi possível abrir a tela de adicionar demanda: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    public Integer obterIdClienteSelecionado() {
+        Cliente clienteSelecionado = cbCliente.getSelectionModel().getSelectedItem();
+        if (clienteSelecionado != null) {
+            return clienteSelecionado.getIdCliente(); // Supondo que Cliente tenha o método getIdCliente()
+        }
+        return null; // Nenhum cliente selecionado
+    }
+
+
     private void atualizarValorTotalComDesconto(double percentualDesconto) {
         double valorComDesconto = calcularTotalComDesconto(percentualDesconto);
         lblPrecoTotal.setText("Valor Total: R$ " + String.format("%.2f", valorComDesconto));
@@ -597,4 +636,5 @@ public class TransacaoController {
         // Exibe o alerta
         alert.showAndWait();
     }
+
 }

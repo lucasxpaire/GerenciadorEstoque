@@ -40,7 +40,8 @@
         <!-- Botão Adicionar Item -->
         <Button onAction="#adicionarItem" prefHeight="25.0" prefWidth="100.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Adicionar Item" />
         <Button onAction="#verificarFidelidade" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Verificar Fidelidade" />
-   
+        <Button onAction="#adicionarDemanda" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Adicionar Produto Demandado" />
+
        <!-- Novo botão para criar desconto -->
     <!--<Button onAction="#handleCriarDesconto" prefHeight="25.0" prefWidth="118.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Criar Desconto" />-->
  </HBox>
