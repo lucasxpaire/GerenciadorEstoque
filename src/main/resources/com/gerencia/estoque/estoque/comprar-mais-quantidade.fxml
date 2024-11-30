@@ -27,7 +27,7 @@
 
     <!-- Botões -->
     <HBox spacing="10" alignment="CENTER">
-        <Button text="Confirmar" onAction="#confirmarCompra" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-        <Button text="Cancelar" onAction="#fecharJanela" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+        <Button text="Confirmar" onAction="#confirmarCompra" style="-fx-background-color: #262626; -fx-text-fill: white;"/>
+        <Button text="Cancelar" onAction="#fecharJanela" style="-fx-background-color: #262626; -fx-text-fill: white;"/>
     </HBox>
 </VBox>

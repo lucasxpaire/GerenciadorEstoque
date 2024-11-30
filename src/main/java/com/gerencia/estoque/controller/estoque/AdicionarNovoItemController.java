@@ -44,6 +44,8 @@ public class AdicionarNovoItemController {
 
             EstoqueDAO estoqueDAO = new EstoqueDAO();
             estoqueDAO.adicionarProduto(novoProduto);
+
+
             mostrarAlerta("Sucesso", "Produto adicionado ao estoque!", Alert.AlertType.INFORMATION);
             descricaoField.clear();
             precoField.clear();

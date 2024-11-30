@@ -31,25 +31,58 @@ public class EstoqueDAO {
         return estoqueList;
     }
 
-    // Método para atualizar a quantidade de um produto no estoque
     public void atualizarEstoque(int idProduto, int quantidade) throws SQLException {
-        String sql = "UPDATE Estoque SET Quantidade = Quantidade + ? WHERE IdProduto = ?";
+        String atualizarEstoque = "UPDATE Estoque SET Quantidade = Quantidade + ? WHERE IdProduto = ?";
+        String buscarPreco = "SELECT Preco, Descricao FROM Estoque WHERE IdProduto = ?";
+        String inserirTransacao = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, DataHora, Tipo) " +
+                "VALUES (?, ?, NULL, ?, ?, ?, CURRENT_TIMESTAMP, 'Compra')";
+
         try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, quantidade);
-            stmt.setInt(2, idProduto);
-            stmt.executeUpdate();
+             PreparedStatement stmtEstoque = conn.prepareStatement(atualizarEstoque);
+             PreparedStatement stmtBuscarPreco = conn.prepareStatement(buscarPreco);
+             PreparedStatement stmtTransacao = conn.prepareStatement(inserirTransacao)) {
+
+            // Atualizar a quantidade no estoque
+            stmtEstoque.setInt(1, quantidade);
+            stmtEstoque.setInt(2, idProduto);
+            stmtEstoque.executeUpdate();
+
+            // Buscar preço e descrição do produto
+            stmtBuscarPreco.setInt(1, idProduto);
+            ResultSet rs = stmtBuscarPreco.executeQuery();
+            if (!rs.next()) {
+                throw new SQLException("Produto não encontrado no estoque.");
+            }
+            double precoUnitario = rs.getDouble("Preco");
+            String descricao = rs.getString("Descricao");
+
+            // Calcular o preço total
+            double precoTotal = precoUnitario * quantidade;
+
+            // Buscar ID do proprietário
+            int idFuncionario = buscarIdProprietario();
+
+            // Inserir na tabela Transacao
+            stmtTransacao.setInt(1, idProduto);
+            stmtTransacao.setInt(2, idFuncionario);
+            stmtTransacao.setDouble(3, precoTotal);
+            stmtTransacao.setString(4, descricao);
+            stmtTransacao.setInt(5, quantidade);
+            stmtTransacao.executeUpdate();
         }
     }
 
-    // Método para adicionar um novo produto ao estoque
+
     public void adicionarProduto(Estoque produto) throws SQLException {
         String inserirProduto = "INSERT INTO Produto (Preco, Descricao) VALUES (?, ?) RETURNING IdProduto";
         String inserirEstoque = "INSERT INTO Estoque (IdProduto, Preco, Descricao, Quantidade) VALUES (?, ?, ?, ?)";
+        String inserirTransacao = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, DataHora, Tipo) " +
+                "VALUES (?, ?, NULL, ?, ?, ?, CURRENT_TIMESTAMP, 'Compra')";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmtProduto = conn.prepareStatement(inserirProduto);
-             PreparedStatement stmtEstoque = conn.prepareStatement(inserirEstoque)) {
+             PreparedStatement stmtEstoque = conn.prepareStatement(inserirEstoque);
+             PreparedStatement stmtTransacao = conn.prepareStatement(inserirTransacao)) {
 
             // Inserir na tabela Produto
             stmtProduto.setDouble(1, produto.getPreco());
@@ -68,8 +101,21 @@ public class EstoqueDAO {
             stmtEstoque.setString(3, produto.getDescricao());
             stmtEstoque.setInt(4, produto.getQuantidade());
             stmtEstoque.executeUpdate();
+
+            // Buscar ID do proprietário
+            int idFuncionario = buscarIdProprietario();
+
+            // Inserir na tabela Transacao
+            double precoTotal = produto.getPreco() * produto.getQuantidade();
+            stmtTransacao.setInt(1, idProduto);
+            stmtTransacao.setInt(2, idFuncionario);
+            stmtTransacao.setDouble(3, precoTotal);
+            stmtTransacao.setString(4, produto.getDescricao());
+            stmtTransacao.setInt(5, produto.getQuantidade());
+            stmtTransacao.executeUpdate();
         }
     }
+
 
 
     // Método para buscar o id de um produto pelo nome ou descrição
@@ -85,4 +131,19 @@ public class EstoqueDAO {
         }
         return -1; // Produto não encontrado
     }
+
+    public int buscarIdProprietario() throws SQLException {
+        String sql = "SELECT IdCredencial FROM Credenciais WHERE tipo LIKE ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%Proprietário%"); // Ajuste conforme o padrão utilizado para identificar o proprietário
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("IdCredencial");
+            } else {
+                throw new SQLException("Proprietário não encontrado.");
+            }
+        }
+    }
+
 }
