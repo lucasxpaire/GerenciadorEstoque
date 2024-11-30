@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Comparator;
 
 public class TransacaoController {
     @FXML
@@ -273,7 +274,7 @@ public class TransacaoController {
                     descontosDisponiveis.add("Nenhum Desconto"); // Opção padrão sem desconto
 
                     // Buscar todos os descontos da tabela
-                    String queryDescontos = "SELECT * FROM Desconto ORDER BY PontosMinimos DESC";
+                    String queryDescontos = "SELECT * FROM Desconto ORDER BY PontosMinimos ASC";
                     try (PreparedStatement statementDesconto = connection.prepareStatement(queryDescontos)) {
                         ResultSet rsDescontos = statementDesconto.executeQuery();
 
@@ -293,7 +294,6 @@ public class TransacaoController {
                                 descontosDisponiveis.add(String.format("%.2f%% - %s", percentualDesconto, descricaoDesconto));
                             }
                         }
-
                         // Atualizar o ComboBox com os descontos encontrados
                         cbDesconto.setItems(descontosDisponiveis);
                         cbDesconto.setVisible(true); // Torna o ComboBox visível
