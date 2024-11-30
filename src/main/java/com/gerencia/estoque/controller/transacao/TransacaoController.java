@@ -5,7 +5,6 @@ import com.gerencia.estoque.model.transacao.Cliente;
 import com.gerencia.estoque.model.transacao.Funcionario;
 import com.gerencia.estoque.model.transacao.ItemResumo;
 import com.gerencia.estoque.model.transacao.Produto;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,8 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.text.TextAlignment;
-import javafx.geometry.Pos;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
 
 public class TransacaoController {
     @FXML
@@ -60,16 +56,21 @@ public class TransacaoController {
     public void initialize() {
         carregarProdutos();
         carregarClientes();
-        carregarFuncionarios();  // Carregar os funcionários
-        // Configuração da tabela de resumo
+        carregarFuncionarios();
         colProduto.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescricao()));
         colQuantidade.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(String.valueOf(cellData.getValue().getQuantidade())));
         colPreco.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(String.valueOf(cellData.getValue().getPrecoTotal())));
-        // Centralizar as colunas na tabela
         colProduto.setStyle("-fx-alignment: center;");
         colQuantidade.setStyle("-fx-alignment: center;");
         colPreco.setStyle("-fx-alignment: center;");
         cbDesconto.setValue("Nenhum Desconto");
+        cbCliente.setOnAction(event -> resetarLabels());
+    }
+
+    private void resetarLabels() {
+        lblDesconto.setText("Desconto: 0%"); // Reseta o label de desconto
+        lblPontos.setText("Pontos: 0"); // Reseta o label de pontos
+        cbDesconto.setValue("Nenhum Desconto"); // Reseta o ComboBox de desconto
     }
 
     private void carregarFuncionarios() {
@@ -147,6 +148,15 @@ public class TransacaoController {
 
                 // Atualiza o valor total após adicionar o item
                 valorTotal += precoTotal;  // Acumula o valor total
+
+                String descontoSelecionado = cbDesconto.getValue();
+                if(descontoSelecionado != null && !descontoSelecionado.isEmpty()){
+                    double percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+                    valorTotal = calcularTotalComDesconto(percentualDesconto);
+                } else{
+                    valorTotal = calcularTotalsemDesconto();
+                }
+
                 atualizarValorTotal(valorTotal); // Atualiza a label com o valor total
 
                 tfQuantidade.clear();
@@ -157,7 +167,6 @@ public class TransacaoController {
             mostrarAlerta("Erro", "Selecione um produto e informe a quantidade.", Alert.AlertType.ERROR);
         }
     }
-
     @FXML
     private void handleConfirmarTransacao() {
         Funcionario funcionarioSelecionado = cbFuncionario.getValue();
@@ -173,13 +182,27 @@ public class TransacaoController {
             // Aplica descontos com base no desconto selecionado
             String descontoSelecionado = cbDesconto.getValue();
             double percentualDesconto = 0.0;
+            int pontosMinimos = 0;
 
             if (descontoSelecionado != null) {
                 // Extrai o percentual de desconto da string usando o método de conversão
                 percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+                // Obter pontos mínimos a partir da tabela de descontos
+                pontosMinimos = obterPontosMinimos(connection, descontoSelecionado);
 
-                // Aplica o desconto ao valor total da transação
-                valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
+                // Verifica se o cliente tem pontos suficientes
+                if (clienteSelecionado != null && pontosMinimos > 0) {
+                    int pontosCliente = obterPontosFidelidade(connection, clienteSelecionado);
+                    if (pontosCliente >= pontosMinimos) {
+                        // Aplica o desconto ao valor total da transação
+                        valorTotalTransacao -= valorTotalTransacao * (percentualDesconto / 100);
+                        // Decrementa os pontos
+                        atualizarPontosFidelidade(connection, clienteSelecionado, -pontosMinimos); // Decrementa os pontos
+                    } else {
+                        mostrarAlerta("Erro", "Você não possui pontos suficientes para este desconto.", Alert.AlertType.ERROR);
+                        return;
+                    }
+                }
             }
 
             // Aplica desconto de 15% para a primeira compra, se aplicável
@@ -204,27 +227,90 @@ public class TransacaoController {
 
                 atualizarEstoque(connection, produtoSelecionado, item);
 
-                // Atualizar pontos de fidelidade, se necessário
-                if (clienteSelecionado != null && valorTotalTransacao >= 10) {
-                    double pontosAcumulados = 4; // Exemplo de cálculo de pontos
-                    atualizarPontosFidelidade(connection, clienteSelecionado, pontosAcumulados);
-                }
-
                 // Adicionar transação com valor ajustado
                 adicionarTransacao(connection, produtoSelecionado, funcionarioSelecionado, clienteSelecionado,
                         new ItemResumo(item.getDescricao(), item.getQuantidade(), valorTotalTransacao));
             }
-
-
+            // Atualizar pontos de fidelidade, se necessário
+            if (clienteSelecionado != null && valorTotalTransacao >= 10) {
+                double pontosAcumulados = 4; // Exemplo de cálculo de pontos
+                atualizarPontosFidelidade(connection, clienteSelecionado, pontosAcumulados);
+            }
             finalizarTransacao();
-
             mostrarAlerta("Sucesso", String.format("Transação concluída com sucesso! Valor total: R$ %.2f", valorTotalTransacao), Alert.AlertType.INFORMATION);
             recarregarTela();
-
         } catch (SQLException e) {
             mostrarAlerta("Erro", "Falha ao processar a transação: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleLimparItens() {
+        // Obter os itens selecionados na tabela
+        ObservableList<ItemResumo> itensSelecionados = tvResumo.getSelectionModel().getSelectedItems();
+        // Verifica se há itens selecionados
+        if (itensSelecionados.isEmpty()) {
+            mostrarAlerta("Erro", "Selecione pelo menos um item para remover.", Alert.AlertType.ERROR);
+            return;
+        }
+        // Remove os itens selecionados da lista de resumo
+        resumoTransacao.removeAll(itensSelecionados);
+        // Atualiza a tabela
+        tvResumo.setItems(resumoTransacao);
+
+        String descontoSelecionado = cbDesconto.getValue();
+        if(descontoSelecionado != null && !descontoSelecionado.isEmpty()){
+            double percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+            valorTotal = calcularTotalComDesconto(percentualDesconto);
+        } else{
+            valorTotal = calcularTotalsemDesconto();
+        }
+        //valorTotal = calcularTotalsemDesconto();
+        // Atualiza o valor total
+        atualizarValorTotal(valorTotal); // Recalcula o total sem desconto
+    }
+    private double calcularTotalsemDesconto() {
+        double total = 0.0;
+        for (ItemResumo item : tvResumo.getItems()) {
+            total += item.getPrecoTotal();
+        }
+        return total;
+    }
+
+    private int obterPontosFidelidade(Connection connection, Cliente cliente) throws SQLException {
+        String queryFidelidade = "SELECT Pontos FROM Fidelidade WHERE IdCliente = ?";
+        try (PreparedStatement statement = connection.prepareStatement(queryFidelidade)) {
+            statement.setInt(1, cliente.getIdCliente());
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Pontos");
+            }
+        }
+        return 0; // Retorna 0 se não encontrar os pontos
+    }
+    private int obterPontosMinimos(Connection connection, String descontoSelecionado) throws SQLException {
+        String query = "SELECT PontosMinimos FROM Desconto WHERE Percentual = ? AND Descricao LIKE ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            double percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+            statement.setDouble(1, percentualDesconto);
+
+            // Verifica se a descrição contém " - " e ajusta a busca
+            String descricaoBusca = "";
+            if (descontoSelecionado.contains(" - ")) {
+                descricaoBusca = "%" + descontoSelecionado.split(" - ")[1] + "%"; // Busca pela descrição
+            } else {
+                descricaoBusca = "%" + descontoSelecionado + "%"; // Se não houver " - ", busca pelo próprio desconto
+            }
+
+            statement.setString(2, descricaoBusca);
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("PontosMinimos");
+            }
+        }
+        return 0; // Retorna 0 se não encontrar os pontos mínimos
     }
 
     private double obterPercentualDesconto(String descontoSelecionado) {
@@ -252,6 +338,7 @@ public class TransacaoController {
         }
         return percentualDesconto;
     }
+
     @FXML
     private void verificarFidelidade() {
         Cliente clienteSelecionado = cbCliente.getValue();
@@ -423,7 +510,6 @@ public class TransacaoController {
         cbCliente.setPromptText("Selecione um cliente");
         cbFuncionario.setPromptText("Selecione um funcionário");
     }
-
     private void recarregarTela() {
         try {
             // Obter o stage atual
@@ -439,7 +525,6 @@ public class TransacaoController {
             mostrarAlerta("Erro", "Falha ao recarregar a tela: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-
     @FXML
     private void handleAbrirCadastroCliente() {
         try {

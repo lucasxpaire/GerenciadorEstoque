@@ -69,11 +69,16 @@
 
     <!-- Label para mostrar o preço total após desconto -->
     <Label fx:id="lblPrecoTotal" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #262626;" text="Preço Total: R$ 0.00" />
-
-    <Button onAction="#handleConfirmarTransacao" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Confirmar Transação" />
-
-    <!-- Botão Voltar -->
-    <HBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-        <Button onAction="#voltar" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Voltar" />
-    </HBox>
+   <HBox alignment="CENTER" prefHeight="25.0" prefWidth="412.0" spacing="20.0">
+      <children>
+      
+          <Button onAction="#handleConfirmarTransacao" prefHeight="25.0" prefWidth="111.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Confirmar Transação" />
+          <Button alignment="CENTER" onAction="#handleLimparItens" prefHeight="25.0" prefWidth="115.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Limpar Transação" />
+      </children>
+   </HBox>
+   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="114.0">
+      <children>
+           <Button onAction="#voltar" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: #262626; -fx-text-fill: #FFFFFF;" text="Voltar" />
+      </children>
+   </HBox>
 </VBox>
