@@ -204,16 +204,17 @@ public class TransacaoController {
 
                 atualizarEstoque(connection, produtoSelecionado, item);
 
+                // Atualizar pontos de fidelidade, se necessário
+                if (clienteSelecionado != null && valorTotalTransacao >= 10) {
+                    double pontosAcumulados = 4; // Exemplo de cálculo de pontos
+                    atualizarPontosFidelidade(connection, clienteSelecionado, pontosAcumulados);
+                }
+
                 // Adicionar transação com valor ajustado
                 adicionarTransacao(connection, produtoSelecionado, funcionarioSelecionado, clienteSelecionado,
                         new ItemResumo(item.getDescricao(), item.getQuantidade(), valorTotalTransacao));
             }
 
-            // Atualizar pontos de fidelidade, se necessário
-            if (clienteSelecionado != null) {
-                double pontosAcumulados = (valorTotalTransacao / 10) * 4; // Exemplo de cálculo de pontos
-                atualizarPontosFidelidade(connection, clienteSelecionado, pontosAcumulados);
-            }
 
             finalizarTransacao();
 
