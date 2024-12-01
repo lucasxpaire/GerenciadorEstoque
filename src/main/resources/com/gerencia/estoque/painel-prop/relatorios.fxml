@@ -19,6 +19,7 @@
             <!-- Relatório de Transações -->
             <Tab text="Transações">
                 <VBox spacing="10" style="-fx-padding: 10;">
+                    <!-- Tabela de Transações -->
                     <TableView fx:id="tabelaTransacoes">
                         <columns>
                             <TableColumn fx:id="colunaIdTransacao" text="ID" visible="false" />
@@ -26,7 +27,19 @@
                             <TableColumn fx:id="colunaQuantidade" text="Quantidade" />
                             <TableColumn fx:id="colunaPreco" text="Preço" />
                             <TableColumn fx:id="colunaDataHora" text="Data/Hora" />
-                            <TableColumn fx:id="colunaValorTotal" text="Valor Total" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+
+                    <!-- Nova Tabela de Produtos Vendidos -->
+                    <Label text="Produtos Vendidos" />
+                    <TableView fx:id="tabelaProdutosVendidos">
+                        <columns>
+                            <TableColumn fx:id="colunaProdutoVendido" text="Produto" />
+                            <TableColumn fx:id="colunaQuantidadeVendidaTransacao" text="Quantidade Vendida" />
+                            <TableColumn fx:id="colunaPrecoTotal" text="Preço Total" />
                         </columns>
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -69,6 +82,7 @@
             <!-- Relatório de Descontos Aplicados -->
             <Tab text="Descontos Aplicados">
                 <VBox spacing="10" style="-fx-padding: 10;">
+                    <!-- Tabela de Descontos Aplicados -->
                     <TableView fx:id="tabelaDescontos">
                         <columns>
                             <TableColumn fx:id="colunaIdDesconto" text="ID Desconto" visible="false" />
@@ -79,8 +93,21 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
+
+                    <!-- Nova Tabela: Descontos Mais Aplicados -->
+                    <Label text="Descontos Mais Aplicados" />
+                    <TableView fx:id="tabelaDescontosMaisAplicados">
+                        <columns>
+                            <TableColumn fx:id="colunaDescricaoDescontoAplicado" text="Descrição do Desconto" />
+                            <TableColumn fx:id="colunaQuantidadeAplicada" text="Quantidade Aplicada" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
                 </VBox>
             </Tab>
+
 
             <!-- Relatório de Pontuação de Clientes -->
             <Tab text="Pontuação de Clientes">
@@ -100,14 +127,14 @@
             </Tab>
 
             <!-- Relatório de Métricas -->
-            <Tab text="Métricas">
+            <Tab text="Compras e Vendas">
                 <VBox spacing="10" style="-fx-padding: 10;">
                     <!-- Produtos Mais Vendidos -->
                     <Label text="Produtos Mais Vendidos" />
                     <TableView fx:id="tabelaProdutosMaisVendidos">
                         <columns>
                             <TableColumn fx:id="colunaProdutoVendidos" text="Produto" />
-                            <TableColumn fx:id="colunaQuantidadeVendida" text="Quantidade Vendida" />
+                            <TableColumn fx:id="colunaQuantidadeVendidaMetricas" text="Quantidade Vendida" />
                         </columns>
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

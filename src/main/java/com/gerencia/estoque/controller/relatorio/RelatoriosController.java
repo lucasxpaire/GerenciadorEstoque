@@ -58,7 +58,7 @@ public class RelatoriosController {
     @FXML
     private TableColumn<RelatorioMetricas, String> colunaProdutoVendidos;
     @FXML
-    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeVendida;
+    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeVendidaMetricas;
     @FXML
     private TableColumn<RelatorioMetricas, String> colunaProdutoComprado;
     @FXML
@@ -66,6 +66,11 @@ public class RelatoriosController {
 
     @FXML TableColumn<RelatorioItensMaisDemandados, String> colunaItemDemandadoMaisRequisitado;
     @FXML TableColumn<RelatorioItensMaisDemandados, Integer> colunaQuantidadeDemandadaTotal;
+
+    @FXML private TableView<RelatorioDescontosAplicados> tabelaDescontosMaisAplicados;
+    @FXML private TableColumn<RelatorioDescontosAplicados, String> colunaDescricaoDescontoAplicado;
+    @FXML private TableColumn<RelatorioDescontosAplicados, Integer> colunaQuantidadeAplicada;
+
 
 
     // Métodos de Inicialização
@@ -81,6 +86,9 @@ public class RelatoriosController {
         calcularProdutosMaisVendidos();
         calcularProdutosMaisComprados();
         calcularItensMaisDemandados();
+        carregarDescontosMaisAplicados();
+        carregarProdutosVendidos();
+
 
         centralizarColunas();
         colunaIdTransacao.setVisible(false);
@@ -116,7 +124,7 @@ public class RelatoriosController {
 
         // Centraliza as colunas da Tabela Métricas
         colunaProdutoVendidos.setStyle("-fx-alignment: CENTER;");
-        colunaQuantidadeVendida.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeVendidaMetricas.setStyle("-fx-alignment: CENTER;");
         colunaProdutoComprado.setStyle("-fx-alignment: CENTER;");
         colunaQuantidadeComprada.setStyle("-fx-alignment: CENTER;");
 
@@ -300,7 +308,7 @@ public class RelatoriosController {
         }
         tabelaProdutosMaisVendidos.setItems(dados);
         colunaProdutoVendidos.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
-        colunaQuantidadeVendida.setCellValueFactory(cellData -> cellData.getValue().quantidadeVendidaProperty().asObject());
+        colunaQuantidadeVendidaMetricas.setCellValueFactory(cellData -> cellData.getValue().quantidadeVendidaProperty().asObject());
     }
 
 
@@ -362,4 +370,67 @@ public class RelatoriosController {
         colunaItemDemandadoMaisRequisitado.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
         colunaQuantidadeDemandadaTotal.setCellValueFactory(cellData -> cellData.getValue().quantidadeDemandadaProperty().asObject());
     }
+
+    // Método para carregar dados de descontos aplicados
+    private void carregarDescontosMaisAplicados() {
+        ObservableList<RelatorioDescontosAplicados> dados = FXCollections.observableArrayList();
+        try (Connection connection = Database.getConnection()) {
+            // Consulta para pegar os descontos aplicados nas transações com o campo IdDesconto não nulo
+            String sql = "SELECT d.Descricao, COUNT(t.IdTransacao) AS quantidade_aplicada " +
+                    "FROM Transacao t " +
+                    "JOIN Desconto d ON t.IdDesconto = d.IdDesconto " + // Verifica se o desconto foi aplicado
+                    "WHERE t.IdDesconto IS NOT NULL " +  // Filtra as transações com desconto
+                    "GROUP BY d.Descricao " + // Agrupa pela descrição do desconto
+                    "ORDER BY quantidade_aplicada DESC"; // Opcional: ordena os descontos mais aplicados
+
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                dados.add(new RelatorioDescontosAplicados(
+                        rs.getString("Descricao"), // Obtém a descrição do desconto
+                        rs.getInt("quantidade_aplicada") // Obtém a quantidade de vezes que o desconto foi aplicado
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        tabelaDescontosMaisAplicados.setItems(dados);
+        // Mapeamento das colunas da tabela (supondo que você já tenha feito a configuração das colunas no FXML)
+        colunaDescricaoDescontoAplicado.setCellValueFactory(cellData -> cellData.getValue().descricaoDescontoProperty());
+        colunaQuantidadeAplicada.setCellValueFactory(cellData -> cellData.getValue().quantidadeAplicadaProperty().asObject());
+    }
+
+    // Método para carregar os dados da tabela de Relatório de Produtos Vendidos
+    @FXML private TableView<RelatorioProdutosVendidos> tabelaProdutosVendidos;
+    @FXML private TableColumn<RelatorioProdutosVendidos, String> colunaProdutoVendido;
+    @FXML private TableColumn<RelatorioProdutosVendidos, Integer> colunaQuantidadeVendidaTransacao;
+    @FXML private TableColumn<RelatorioProdutosVendidos, Double> colunaPrecoTotal;
+
+    private void carregarProdutosVendidos() {
+        ObservableList<RelatorioProdutosVendidos> dados = FXCollections.observableArrayList();
+        try (Connection connection = Database.getConnection()) {
+            // Consulta para obter os produtos mais vendidos
+            String sql = "SELECT Descricao, SUM(Quantidade) AS total_vendido, SUM(Preco * Quantidade) AS preco_total " +
+                    "FROM Transacao " +
+                    "WHERE Tipo = 'Venda' " +
+                    "GROUP BY Descricao " +
+                    "ORDER BY total_vendido DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                dados.add(new RelatorioProdutosVendidos(
+                        rs.getString("Descricao"),
+                        rs.getInt("total_vendido"),
+                        rs.getDouble("preco_total")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        tabelaProdutosVendidos.setItems(dados);
+        colunaProdutoVendido.setCellValueFactory(cellData -> cellData.getValue().nomeProdutoProperty());
+        colunaQuantidadeVendidaTransacao.setCellValueFactory(cellData -> cellData.getValue().quantidadeVendidaProperty().asObject());
+        colunaPrecoTotal.setCellValueFactory(cellData -> cellData.getValue().precoTotalProperty().asObject());
+    }
+
 }

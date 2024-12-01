@@ -456,7 +456,7 @@ public class TransacaoController {
 
     // Função para adicionar transação
     private void adicionarTransacao(Connection connection, Produto produto, Funcionario funcionario, Cliente cliente, ItemResumo item) throws SQLException {
-        String query = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, Tipo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Transacao (IdProduto, IdFuncionario, IdCliente, Preco, Descricao, Quantidade, Tipo, IdDesconto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, produto.getIdProduto());
             statement.setInt(2, funcionario.getIdFuncionario());
@@ -469,9 +469,39 @@ public class TransacaoController {
             statement.setString(5, item.getDescricao());
             statement.setInt(6, item.getQuantidade());
             statement.setString(7, "Venda");
+            // Verifica se há um desconto selecionado
+            String descontoSelecionado = cbDesconto.getValue();
+            if (descontoSelecionado != null && !descontoSelecionado.equals("Nenhum Desconto")) {
+                // Obtém o IdDesconto
+                int idDesconto = obterIdDesconto(connection, descontoSelecionado);
+                statement.setInt(8, idDesconto);
+            } else {
+                // Caso não haja desconto, armazena NULL
+                statement.setNull(8, java.sql.Types.INTEGER);
+            }
             statement.executeUpdate();
         }
     }
+
+    private int obterIdDesconto(Connection connection, String descontoSelecionado) throws SQLException {
+        String query = "SELECT IdDesconto FROM Desconto WHERE Percentual = ? AND Descricao LIKE ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            double percentualDesconto = obterPercentualDesconto(descontoSelecionado);
+            statement.setDouble(1, percentualDesconto);
+
+            // Monta a descrição de busca do desconto
+            String descricaoBusca = "%" + descontoSelecionado.split(" - ")[1] + "%";
+            statement.setString(2, descricaoBusca);
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("IdDesconto");
+            }
+        }
+        return -1; // Retorna -1 caso não encontre um desconto válido
+    }
+
 
     // Função para atualizar pontos de fidelidade
     private void atualizarPontosFidelidade(Connection connection, Cliente cliente, double pontosAcumulados) throws SQLException {
