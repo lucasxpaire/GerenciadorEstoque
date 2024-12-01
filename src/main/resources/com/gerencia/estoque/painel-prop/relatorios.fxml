@@ -109,22 +109,22 @@
             </Tab>
 
 
-            <!-- Relatório de Pontuação de Clientes -->
-            <Tab text="Pontuação de Clientes">
-                <VBox spacing="10" style="-fx-padding: 10;">
-                    <TableView fx:id="tabelaPontuacaoClientes">
-                        <columns>
-                            <TableColumn fx:id="colunaIdClientePontuacao" text="ID Cliente" visible="false" />
-                            <TableColumn fx:id="colunaNomeClientePontuacao" text="Nome" />
-                            <TableColumn fx:id="colunaPontuacao" text="Pontuação" />
-                            <TableColumn fx:id="colunaComprasFeitas" text="Compras feitas" />
-                        </columns>
-                        <columnResizePolicy>
-                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                        </columnResizePolicy>
-                    </TableView>
-                </VBox>
-            </Tab>
+<!--            &lt;!&ndash; Relatório de Pontuação de Clientes &ndash;&gt;-->
+<!--            <Tab text="Pontuação de Clientes">-->
+<!--                <VBox spacing="10" style="-fx-padding: 10;">-->
+<!--                    <TableView fx:id="tabelaPontuacaoClientes">-->
+<!--                        <columns>-->
+<!--                            <TableColumn fx:id="colunaIdClientePontuacao" text="ID Cliente" visible="false" />-->
+<!--                            <TableColumn fx:id="colunaNomeClientePontuacao" text="Nome" />-->
+<!--                            <TableColumn fx:id="colunaPontuacao" text="Pontuação" />-->
+<!--                            <TableColumn fx:id="colunaComprasFeitas" text="Compras feitas" />-->
+<!--                        </columns>-->
+<!--                        <columnResizePolicy>-->
+<!--                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />-->
+<!--                        </columnResizePolicy>-->
+<!--                    </TableView>-->
+<!--                </VBox>-->
+<!--            </Tab>-->
 
             <!-- Relatório de Métricas -->
             <Tab text="Compras e Vendas">

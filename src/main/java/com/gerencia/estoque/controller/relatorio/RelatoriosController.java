@@ -20,50 +20,39 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class RelatoriosController {
-
-    // Tabelas
     @FXML private TableView<RelatorioTransacoes> tabelaTransacoes;
-    @FXML private TableView<RelatorioDemanda> tabelaDemanda;
-    @FXML private TableView<RelatorioDescontos> tabelaDescontos;
-    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisVendidos;
-    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisComprados;
-    @FXML private TableView<RelatorioItensMaisDemandados> tabelaItensMaisDemandados;
-
-    // Colunas da Tabela Transações
     @FXML private TableColumn<RelatorioTransacoes, Integer> colunaIdTransacao;
     @FXML private TableColumn<RelatorioTransacoes, String> colunaProduto;
     @FXML private TableColumn<RelatorioTransacoes, Integer> colunaQuantidade;
     @FXML private TableColumn<RelatorioTransacoes, Double> colunaPreco;
     @FXML private TableColumn<RelatorioTransacoes, String> colunaDataHora;
 
-    // Colunas da Tabela Demanda
+    @FXML private TableView<RelatorioDemanda> tabelaDemanda;
     @FXML private TableColumn<RelatorioDemanda, String> colunaClienteDemanda;
     @FXML private TableColumn<RelatorioDemanda, String> colunaItemDemandado;
     @FXML private TableColumn<RelatorioDemanda, Integer> colunaQuantidadeDemandada;
     @FXML private TableColumn<RelatorioDemanda, String> colunaUltimaDataDemanda;
 
-    // Colunas da Tabela Descontos
+    @FXML private TableView<RelatorioDescontos> tabelaDescontos;
     @FXML private TableColumn<RelatorioDescontos, Integer> colunaIdDesconto;
     @FXML private TableColumn<RelatorioDescontos, String> colunaDescricaoDesconto;
     @FXML private TableColumn<RelatorioDescontos, Integer> colunaQtdAplicada;
 
-    // Colunas da Tabela Pontuação de Clientes
-    @FXML private TableView<RelatorioPontuacaoClientes> tabelaPontuacaoClientes;
-    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaIdClientePontuacao;
-    @FXML private TableColumn<RelatorioPontuacaoClientes, String> colunaNomeClientePontuacao;
-    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaPontuacao;
-    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaComprasFeitas; // Nova coluna
+//    // Colunas da Tabela Pontuação de Clientes
+//    @FXML private TableView<RelatorioPontuacaoClientes> tabelaPontuacaoClientes;
+//    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaIdClientePontuacao;
+//    @FXML private TableColumn<RelatorioPontuacaoClientes, String> colunaNomeClientePontuacao;
+//    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaPontuacao;
+//    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaComprasFeitas; // Nova coluna
 
-    // Colunas da Tabela Metricas
-    @FXML
-    private TableColumn<RelatorioMetricas, String> colunaProdutoVendidos;
-    @FXML
-    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeVendidaMetricas;
-    @FXML
-    private TableColumn<RelatorioMetricas, String> colunaProdutoComprado;
-    @FXML
-    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeComprada;
+    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisVendidos;
+    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisComprados;
+    @FXML private TableColumn<RelatorioMetricas, String> colunaProdutoVendidos;
+    @FXML private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeVendidaMetricas;
+    @FXML private TableColumn<RelatorioMetricas, String> colunaProdutoComprado;
+    @FXML private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeComprada;
 
+    @FXML private TableView<RelatorioItensMaisDemandados> tabelaItensMaisDemandados;
     @FXML TableColumn<RelatorioItensMaisDemandados, String> colunaItemDemandadoMaisRequisitado;
     @FXML TableColumn<RelatorioItensMaisDemandados, Integer> colunaQuantidadeDemandadaTotal;
 
@@ -71,9 +60,11 @@ public class RelatoriosController {
     @FXML private TableColumn<RelatorioDescontosAplicados, String> colunaDescricaoDescontoAplicado;
     @FXML private TableColumn<RelatorioDescontosAplicados, Integer> colunaQuantidadeAplicada;
 
+    @FXML private TableView<RelatorioProdutosVendidos> tabelaProdutosVendidos;
+    @FXML private TableColumn<RelatorioProdutosVendidos, String> colunaProdutoVendido;
+    @FXML private TableColumn<RelatorioProdutosVendidos, Integer> colunaQuantidadeVendidaTransacao;
+    @FXML private TableColumn<RelatorioProdutosVendidos, Double> colunaPrecoTotal;
 
-
-    // Métodos de Inicialização
     @FXML
     public void initialize() {
         formatarColunaDataTransacao(colunaDataHora);
@@ -82,17 +73,16 @@ public class RelatoriosController {
         carregarDadosTransacoes();
         carregarDadosDemanda();
         carregarDadosDescontos();
-        carregarDadosPontuacaoClientes();
+        //carregarDadosPontuacaoClientes();
         calcularProdutosMaisVendidos();
         calcularProdutosMaisComprados();
         calcularItensMaisDemandados();
         carregarDescontosMaisAplicados();
         carregarProdutosVendidos();
 
-
         centralizarColunas();
         colunaIdTransacao.setVisible(false);
-        colunaIdClientePontuacao.setVisible(false);
+        //colunaIdClientePontuacao.setVisible(false);
         colunaIdDesconto.setVisible(false);
     }
 
@@ -117,10 +107,10 @@ public class RelatoriosController {
         colunaQtdAplicada.setStyle("-fx-alignment: CENTER;");
 
         // Centraliza as colunas da Tabela de Pontuação de Clientes
-        colunaIdClientePontuacao.setStyle("-fx-alignment: CENTER;");
-        colunaNomeClientePontuacao.setStyle("-fx-alignment: CENTER;");
-        colunaPontuacao.setStyle("-fx-alignment: CENTER;");
-        colunaComprasFeitas.setStyle("-fx-alignment: CENTER;");
+//        colunaIdClientePontuacao.setStyle("-fx-alignment: CENTER;");
+//        colunaNomeClientePontuacao.setStyle("-fx-alignment: CENTER;");
+//        colunaPontuacao.setStyle("-fx-alignment: CENTER;");
+//        colunaComprasFeitas.setStyle("-fx-alignment: CENTER;");
 
         // Centraliza as colunas da Tabela Métricas
         colunaProdutoVendidos.setStyle("-fx-alignment: CENTER;");
@@ -131,6 +121,13 @@ public class RelatoriosController {
         // Centraliza as colunas da Tabela de Itens Mais Demandados
         colunaItemDemandadoMaisRequisitado.setStyle("-fx-alignment: CENTER;");
         colunaQuantidadeDemandadaTotal.setStyle("-fx-alignment: CENTER;");
+
+        colunaDescricaoDescontoAplicado.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeAplicada.setStyle("-fx-alignment: CENTER;");
+
+        colunaProdutoVendido.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeVendidaTransacao.setStyle("-fx-alignment: CENTER;");
+        colunaPrecoTotal.setStyle("-fx-alignment: CENTER;");
     }
 
 
@@ -215,32 +212,32 @@ public class RelatoriosController {
 
     // Método para carregar dados de pontuação de clientes
     // Método para carregar dados de pontuação de clientes
-    private void carregarDadosPontuacaoClientes() {
-        ObservableList<RelatorioPontuacaoClientes> dados = FXCollections.observableArrayList();
-        try (Connection connection = Database.getConnection()) {
-            String sql = "SELECT c.IdCliente, c.Nome, f.Pontos AS pontuacao, " +
-                    "(SELECT COUNT(*) FROM Transacao t WHERE t.IdCliente = c.IdCliente) AS compras_feitas " + // Atualização da consulta
-                    "FROM Cliente c " +
-                    "JOIN Fidelidade f ON c.IdCliente = f.IdCliente";
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                dados.add(new RelatorioPontuacaoClientes(
-                        rs.getInt("IdCliente"),
-                        rs.getString("Nome"),
-                        rs.getInt("pontuacao"),
-                        rs.getInt("compras_feitas") // Atualização para incluir compras feitas
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        tabelaPontuacaoClientes.setItems(dados);
-        colunaIdClientePontuacao.setCellValueFactory(cellData -> cellData.getValue().idClienteProperty().asObject());
-        colunaNomeClientePontuacao.setCellValueFactory(cellData -> cellData.getValue().nomeProperty());
-        colunaPontuacao.setCellValueFactory(cellData -> cellData.getValue().pontuacaoProperty().asObject());
-        colunaComprasFeitas.setCellValueFactory(cellData -> cellData.getValue().comprasFeitasProperty().asObject()); // Atualização para a nova coluna
-    }
+//    private void carregarDadosPontuacaoClientes() {
+//        ObservableList<RelatorioPontuacaoClientes> dados = FXCollections.observableArrayList();
+//        try (Connection connection = Database.getConnection()) {
+//            String sql = "SELECT c.IdCliente, c.Nome, f.Pontos AS pontuacao, " +
+//                    "(SELECT COUNT(*) FROM Transacao t WHERE t.IdCliente = c.IdCliente) AS compras_feitas " + // Atualização da consulta
+//                    "FROM Cliente c " +
+//                    "JOIN Fidelidade f ON c.IdCliente = f.IdCliente";
+//            Statement stmt = connection.createStatement();
+//            ResultSet rs = stmt.executeQuery(sql);
+//            while (rs.next()) {
+//                dados.add(new RelatorioPontuacaoClientes(
+//                        rs.getInt("IdCliente"),
+//                        rs.getString("Nome"),
+//                        rs.getInt("pontuacao"),
+//                        rs.getInt("compras_feitas") // Atualização para incluir compras feitas
+//                ));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        tabelaPontuacaoClientes.setItems(dados);
+//        colunaIdClientePontuacao.setCellValueFactory(cellData -> cellData.getValue().idClienteProperty().asObject());
+//        colunaNomeClientePontuacao.setCellValueFactory(cellData -> cellData.getValue().nomeProperty());
+//        colunaPontuacao.setCellValueFactory(cellData -> cellData.getValue().pontuacaoProperty().asObject());
+//        colunaComprasFeitas.setCellValueFactory(cellData -> cellData.getValue().comprasFeitasProperty().asObject()); // Atualização para a nova coluna
+//    }
 
     private void formatarColunaDataTransacao(TableColumn<RelatorioTransacoes, String> coluna) {
         coluna.setCellFactory(new Callback<TableColumn<RelatorioTransacoes, String>, TableCell<RelatorioTransacoes, String>>() {
@@ -399,12 +396,6 @@ public class RelatoriosController {
         colunaDescricaoDescontoAplicado.setCellValueFactory(cellData -> cellData.getValue().descricaoDescontoProperty());
         colunaQuantidadeAplicada.setCellValueFactory(cellData -> cellData.getValue().quantidadeAplicadaProperty().asObject());
     }
-
-    // Método para carregar os dados da tabela de Relatório de Produtos Vendidos
-    @FXML private TableView<RelatorioProdutosVendidos> tabelaProdutosVendidos;
-    @FXML private TableColumn<RelatorioProdutosVendidos, String> colunaProdutoVendido;
-    @FXML private TableColumn<RelatorioProdutosVendidos, Integer> colunaQuantidadeVendidaTransacao;
-    @FXML private TableColumn<RelatorioProdutosVendidos, Double> colunaPrecoTotal;
 
     private void carregarProdutosVendidos() {
         ObservableList<RelatorioProdutosVendidos> dados = FXCollections.observableArrayList();
