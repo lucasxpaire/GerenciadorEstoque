@@ -1,10 +1,7 @@
 package com.gerencia.estoque.controller.relatorio;
 
 import com.gerencia.estoque.dao.Database;
-import com.gerencia.estoque.model.relatorio.RelatorioDescontos;
-import com.gerencia.estoque.model.relatorio.RelatorioDemanda;
-import com.gerencia.estoque.model.relatorio.RelatorioPontuacaoClientes;
-import com.gerencia.estoque.model.relatorio.RelatorioTransacoes;
+import com.gerencia.estoque.model.relatorio.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -28,6 +25,9 @@ public class RelatoriosController {
     @FXML private TableView<RelatorioTransacoes> tabelaTransacoes;
     @FXML private TableView<RelatorioDemanda> tabelaDemanda;
     @FXML private TableView<RelatorioDescontos> tabelaDescontos;
+    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisVendidos;
+    @FXML private TableView<RelatorioMetricas> tabelaProdutosMaisComprados;
+    @FXML private TableView<RelatorioItensMaisDemandados> tabelaItensMaisDemandados;
 
     // Colunas da Tabela Transações
     @FXML private TableColumn<RelatorioTransacoes, Integer> colunaIdTransacao;
@@ -54,12 +54,19 @@ public class RelatoriosController {
     @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaPontuacao;
     @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaComprasFeitas; // Nova coluna
 
-    @FXML private TableColumn<RelatorioPontuacaoClientes, Integer> colunaVendasAcimaDe10;
+    // Colunas da Tabela Metricas
+    @FXML
+    private TableColumn<RelatorioMetricas, String> colunaProdutoVendidos;
+    @FXML
+    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeVendida;
+    @FXML
+    private TableColumn<RelatorioMetricas, String> colunaProdutoComprado;
+    @FXML
+    private TableColumn<RelatorioMetricas, Integer> colunaQuantidadeComprada;
 
+    @FXML TableColumn<RelatorioItensMaisDemandados, String> colunaItemDemandadoMaisRequisitado;
+    @FXML TableColumn<RelatorioItensMaisDemandados, Integer> colunaQuantidadeDemandadaTotal;
 
-    // Botões
-    @FXML private Button btnMaisVendidos;
-    @FXML private Button btnMaisComprados;
 
     // Métodos de Inicialização
     @FXML
@@ -71,9 +78,14 @@ public class RelatoriosController {
         carregarDadosDemanda();
         carregarDadosDescontos();
         carregarDadosPontuacaoClientes();
+        calcularProdutosMaisVendidos();
+        calcularProdutosMaisComprados();
+        calcularItensMaisDemandados();
 
         centralizarColunas();
-
+        colunaIdTransacao.setVisible(false);
+        colunaIdClientePontuacao.setVisible(false);
+        colunaIdDesconto.setVisible(false);
     }
 
     // Método para configurar o alinhamento das colunas das Tabelas
@@ -101,7 +113,18 @@ public class RelatoriosController {
         colunaNomeClientePontuacao.setStyle("-fx-alignment: CENTER;");
         colunaPontuacao.setStyle("-fx-alignment: CENTER;");
         colunaComprasFeitas.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela Métricas
+        colunaProdutoVendidos.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeVendida.setStyle("-fx-alignment: CENTER;");
+        colunaProdutoComprado.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeComprada.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela de Itens Mais Demandados
+        colunaItemDemandadoMaisRequisitado.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeDemandadaTotal.setStyle("-fx-alignment: CENTER;");
     }
+
 
 
     // Método para carregar dados de transações
@@ -253,18 +276,90 @@ public class RelatoriosController {
         });
     }
 
-
-
-
-    // Métodos para ações dos botões
-    @FXML
-    private void handleMaisVendidos(MouseEvent event) {
-
+    // Método para calcular os produtos mais vendidos
+    private void calcularProdutosMaisVendidos() {
+        ObservableList<RelatorioMetricas> dados = FXCollections.observableArrayList();
+        try (Connection connection = Database.getConnection()) {
+            // Ajustando a consulta SQL para pegar apenas vendas (Tipo = 'Venda')
+            String sql = "SELECT Descricao, SUM(Quantidade) AS total_vendido " +
+                    "FROM Transacao " +
+                    "WHERE Tipo = 'Venda' " +  // Filtra transações do tipo "Venda"
+                    "GROUP BY Descricao " +
+                    "ORDER BY total_vendido DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                dados.add(new RelatorioMetricas(
+                        rs.getString("Descricao"),
+                        rs.getInt("total_vendido"),
+                        0 // Não é necessário para esta tabela
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        tabelaProdutosMaisVendidos.setItems(dados);
+        colunaProdutoVendidos.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
+        colunaQuantidadeVendida.setCellValueFactory(cellData -> cellData.getValue().quantidadeVendidaProperty().asObject());
     }
 
 
-    @FXML
-    private void handleMaisComprados(MouseEvent event) {
-        // Implementar lógica para ver mais comprados
+    // Método para calcular os produtos mais comprados
+    private void calcularProdutosMaisComprados() {
+        ObservableList<RelatorioMetricas> dados = FXCollections.observableArrayList();
+        try (Connection connection = Database.getConnection()) {
+            // Ajustando a consulta SQL para pegar apenas compras (Tipo = 'Compra')
+            String sql = "SELECT Descricao, SUM(Quantidade) AS total_comprado " +
+                    "FROM Transacao " +
+                    "WHERE Tipo = 'Compra' " +  // Filtra transações do tipo "Compra"
+                    "GROUP BY Descricao " +
+                    "ORDER BY total_comprado DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                dados.add(new RelatorioMetricas(
+                        rs.getString("Descricao"),
+                        0, // Não é necessário para esta tabela
+                        rs.getInt("total_comprado")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        tabelaProdutosMaisComprados.setItems(dados);
+        colunaProdutoComprado.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
+        colunaQuantidadeComprada.setCellValueFactory(cellData -> cellData.getValue().quantidadeCompradaProperty().asObject());
+    }
+
+    // Método para calcular os itens mais demandados por cada cliente
+    private void calcularItensMaisDemandados() {
+        ObservableList<RelatorioItensMaisDemandados> dados = FXCollections.observableArrayList();
+        try (Connection connection = Database.getConnection()) {
+            // Consulta para pegar os itens mais demandados por cada cliente
+            String sql = "SELECT i.Descricao AS item, SUM(d.Contagem) AS total_demandado " +
+                    "FROM Demanda d " +
+                    "JOIN ItemDemandado i ON d.IdItem = i.IdItem " +
+                    "GROUP BY i.Descricao " +
+                    "ORDER BY total_demandado DESC";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            // Preenchendo a lista de dados com os resultados da consulta
+            while (rs.next()) {
+                dados.add(new RelatorioItensMaisDemandados(
+                        rs.getString("item"), // Descrição do item
+                        rs.getInt("total_demandado") // Total demandado do item
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Verifica se a tabela espera um ObservableList de RelatorioItensMaisDemandados
+        tabelaItensMaisDemandados.setItems(dados);
+
+        // Definição das células da tabela (supondo que 'produtoProperty' e 'quantidadeDemandadaProperty' existam)
+        colunaItemDemandadoMaisRequisitado.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
+        colunaQuantidadeDemandadaTotal.setCellValueFactory(cellData -> cellData.getValue().quantidadeDemandadaProperty().asObject());
     }
 }
