@@ -1,30 +1,27 @@
 package com.gerencia.estoque.model.relatorio;
 
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 
 public class RelatorioDescontos {
-    private final StringProperty tipoDesconto;
-    private final DoubleProperty valorDesconto;
-    private final DoubleProperty percentualDesconto;
+    private final IntegerProperty idDesconto;
+    private final StringProperty descricao;
+    private final IntegerProperty pontosMinimos;
 
-    public RelatorioDescontos(String tipoDesconto, double valorDesconto, double percentualDesconto) {
-        this.tipoDesconto = new SimpleStringProperty(tipoDesconto);
-        this.valorDesconto = new SimpleDoubleProperty(valorDesconto);
-        this.percentualDesconto = new SimpleDoubleProperty(percentualDesconto);
+    public RelatorioDescontos(int idDesconto, String descricao, int pontosMinimos) {
+        this.idDesconto = new SimpleIntegerProperty(idDesconto);
+        this.descricao = new SimpleStringProperty(descricao);
+        this.pontosMinimos = new SimpleIntegerProperty(pontosMinimos);
     }
 
-    public StringProperty tipoDescontoProperty() {
-        return tipoDesconto;
+    public IntegerProperty idDescontoProperty() {
+        return idDesconto;
     }
 
-    public DoubleProperty valorDescontoProperty() {
-        return valorDesconto;
+    public StringProperty descricaoProperty() {
+        return descricao;
     }
 
-    public DoubleProperty percentualDescontoProperty() {
-        return percentualDesconto;
+    public IntegerProperty pontosMinimosProperty() {
+        return pontosMinimos;
     }
 }

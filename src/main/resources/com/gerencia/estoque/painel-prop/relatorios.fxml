@@ -1,124 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.layout.HBox?>
-<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1000.0" spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.relatorio.RelatoriosController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="com.gerencia.estoque.controller.relatorio.RelatoriosController">
+    <top>
+        <Label text="Relatórios" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER"/>
+    </top>
+    <center>
+        <TabPane>
+            <!-- Relatório de Transações -->
+            <Tab text="Transações">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="tabelaTransacoes">
+                        <columns>
+                            <TableColumn text="ID" fx:id="colunaIdTransacao"/>
+                            <TableColumn text="Produto" fx:id="colunaProduto"/>
+                            <TableColumn text="Quantidade" fx:id="colunaQuantidade"/>
+                            <TableColumn text="Preço" fx:id="colunaPreco"/>
+                            <TableColumn text="Data/Hora" fx:id="colunaDataHora"/>
+                        </columns>
+                    </TableView>
+                    <HBox spacing="20" alignment="CENTER">
+                        <Button text="Ver Mais Vendidos" fx:id="btnMaisVendidos"/>
+                        <Button text="Ver Mais Comprados" fx:id="btnMaisComprados"/>
+                    </HBox>
+                </VBox>
+            </Tab>
 
-    <Text style="-fx-font-size: 24px; -fx-text-fill: #000000;" text="Relatórios Relevantes" />
+            <!-- Relatório de Demanda -->
+            <Tab text="Demanda">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="tabelaDemanda">
+                        <columns>
+                            <TableColumn text="Cliente" fx:id="colunaClienteDemanda"/>
+                            <TableColumn text="Item Demandado" fx:id="colunaItemDemandado"/>
+                            <TableColumn text="Quantidade" fx:id="colunaQuantidadeDemandada"/>
+                            <TableColumn text="Última Data" fx:id="colunaUltimaDataDemanda"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
 
-    <TabPane prefHeight="700.0" prefWidth="950.0">
+            <!-- Relatório de Descontos Aplicados -->
+            <Tab text="Descontos Aplicados">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="tabelaDescontos">
+                        <columns>
+                            <TableColumn text="ID Desconto" fx:id="colunaIdDesconto"/>
+                            <TableColumn text="Descrição" fx:id="colunaDescricaoDesconto"/>
+                            <TableColumn text="Quantidade Aplicada" fx:id="colunaQtdAplicada"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
 
-        <!-- Relatório de Visão Geral -->
-        <Tab text="Visão Geral">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Visão Geral" />
-                <TableView fx:id="tabelaVisaoGeral" prefHeight="400" prefWidth="600">
-                    <columns>
-                        <TableColumn fx:id="colunaTotalVendas" text="Total de Vendas" />
-                        <TableColumn fx:id="colunaProdutoMaisVendido" text="Produto Mais Vendido" />
-                        <TableColumn fx:id="colunaQuantidadeMaisVendida" text="Quantidade Mais Vendida" />
-                        <TableColumn fx:id="colunaProdutoComEstoqueBaixo" text="Produto com Estoque Baixo" />
-                        <TableColumn fx:id="colunaQuantidadeEstoqueBaixo" text="Quantidade Estoque Baixo" />
-                    </columns>
-                </TableView>
-
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Transações -->
-        <Tab text="Transações">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Transações" />
-                <TableView fx:id="tabelaTransacoes" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaDataTransacao" text="Data" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaDescricaoProduto" text="Produto" prefWidth="200" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaQuantidadeTransacao" text="Quantidade" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaValorTransacao" text="Valor" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaFuncionarioTransacao" text="Funcionário" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Estoque -->
-        <Tab text="Estoque">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Estoque Atual" />
-                <TableView fx:id="tabelaEstoque" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaProdutoEstoque" text="Produto" prefWidth="200" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaQuantidadeEstoque" text="Quantidade" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaPrecoEstoque" text="Preço" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Clientes -->
-        <Tab text="Clientes">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Clientes" />
-                <TableView fx:id="tabelaClientes" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaClienteNome" text="Nome" prefWidth="250" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaClientePontos" text="Pontos de Fidelidade" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaUsoDesconto" text="Descontos Utilizados" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Descontos -->
-        <Tab text="Descontos">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Descontos" />
-                <TableView fx:id="tabelaDescontos" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaTipoDesconto" text="Tipo de Desconto" prefWidth="250" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaValorDesconto" text="Valor Total Desconto" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaPercentualDesconto" text="Percentual Médio" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Funcionários -->
-        <Tab text="Funcionários">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Funcionários" />
-                <TableView fx:id="tabelaFuncionarios" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaFuncionarioNome" text="Nome" prefWidth="250" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaFuncionarioVendas" text="Vendas Realizadas" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaFuncionarioValorVendas" text="Valor Total de Vendas" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-        <!-- Relatório de Demandas -->
-        <Tab text="Demandas">
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-                <Text text="Relatório de Demandas" />
-                <TableView fx:id="tabelaDemandas" prefHeight="250" prefWidth="800">
-                    <columns>
-                        <TableColumn fx:id="colunaProdutoDemandado" text="Produto Demandado" prefWidth="250" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaQuantidadeDemandada" text="Quantidade Demandada" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                        <TableColumn fx:id="colunaAtendimentoDemanda" text="Atendimento à Demanda" prefWidth="150" style="-fx-alignment: CENTER-LEFT;" />
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-
-    </TabPane>
-
-    <Button onAction="#voltar" text="Voltar" />
-
-</VBox>
+            <!-- Relatório de Pontuação de Clientes -->
+            <Tab text="Pontuação de Clientes">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="tabelaPontuacaoClientes">
+                        <columns>
+                            <TableColumn text="ID Cliente" fx:id="colunaIdClientePontuacao"/>
+                            <TableColumn text="Nome" fx:id="colunaNomeClientePontuacao"/>
+                            <TableColumn text="Pontuação" fx:id="colunaPontuacao"/>
+                            <TableColumn text="Compras feitas" fx:id="colunaComprasFeitas"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>
