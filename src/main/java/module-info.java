@@ -50,4 +50,7 @@ module com.gerencia.estoque {
     exports com.gerencia.estoque.model.clientes;
     opens com.gerencia.estoque.model.clientes to javafx.base;
 
+    exports com.gerencia.estoque.model.relatorio;
+    opens com.gerencia.estoque.model.relatorio to javafx.base;
+
 }
