@@ -15,7 +15,6 @@ import java.sql.*;
 public class RelatoriosController {
 
     // Tabelas
-    @FXML private TableView<RelatorioVisaoGeral> tabelaVisaoGeral;
     @FXML private TableView<RelatorioTransacoes> tabelaTransacoes;
     @FXML private TableView<RelatorioEstoque> tabelaEstoque;
     @FXML private TableView<RelatorioClientes> tabelaClientes;
@@ -23,11 +22,7 @@ public class RelatoriosController {
     @FXML private TableView<RelatorioFuncionarios> tabelaFuncionarios;
     @FXML private TableView<RelatorioDemandas> tabelaDemandas;
 
-    // Colunas da Tabela Visão Geral
-    @FXML private TableColumn<RelatorioVisaoGeral, String> colunaTotalVendas;
-    @FXML private TableColumn<RelatorioVisaoGeral, String> colunaTotalReceitas;
-    @FXML private TableColumn<RelatorioVisaoGeral, String> colunaProdutosMaisVendidos;
-    @FXML private TableColumn<RelatorioVisaoGeral, String> colunaEstoqueMinimo;
+
 
     // Colunas da Tabela Transações
     @FXML private TableColumn<RelatorioTransacoes, String> colunaDataTransacao;
@@ -46,10 +41,7 @@ public class RelatoriosController {
     @FXML private TableColumn<RelatorioClientes, Integer> colunaClientePontos;
     @FXML private TableColumn<RelatorioClientes, String> colunaUsoDesconto;
 
-    // Colunas da Tabela Descontos
-    @FXML private TableColumn<RelatorioDescontos, String> colunaTipoDesconto;
-    @FXML private TableColumn<RelatorioDescontos, Double> colunaValorDesconto;
-    @FXML private TableColumn<RelatorioDescontos, Double> colunaPercentualDesconto;
+
 
     // Colunas da Tabela Funcionários
     @FXML private TableColumn<RelatorioFuncionarios, String> colunaFuncionarioNome;
@@ -68,7 +60,19 @@ public class RelatoriosController {
     @FXML
     public void initialize() {
         // Carregar os dados das tabelas
+        // Configura as colunas da tabela
+        colunaTotalVendas.setCellValueFactory(cellData -> cellData.getValue().totalVendasProperty().asObject());
+        colunaProdutoMaisVendido.setCellValueFactory(cellData -> cellData.getValue().produtoMaisVendidoProperty());
+        colunaQuantidadeMaisVendida.setCellValueFactory(cellData -> cellData.getValue().quantidadeMaisVendidaProperty().asObject());
+        colunaProdutoComEstoqueBaixo.setCellValueFactory(cellData -> cellData.getValue().produtoComEstoqueBaixoProperty());
+        colunaQuantidadeEstoqueBaixo.setCellValueFactory(cellData -> cellData.getValue().quantidadeEstoqueBaixoProperty().asObject());
+
+        // Adiciona a lista de dados na tabela
+        tabelaVisaoGeral.setItems(dadosRelatorio);
+        // Carrega os dados (se necessário)
         carregarDadosVisaoGeral();
+
+
         carregarDadosTransacoes();
         carregarDadosEstoque();
         carregarDadosClientes();
@@ -77,37 +81,105 @@ public class RelatoriosController {
         carregarDadosDemandas();
     }
 
+    // Declaração da tabela para exibição dos dados
+    @FXML
+    private TableView<RelatorioVisaoGeral> tabelaVisaoGeral;
+
+    // Colunas da tabela
+    @FXML
+    private TableColumn<RelatorioVisaoGeral, Double> colunaTotalVendas;
+    @FXML
+    private TableColumn<RelatorioVisaoGeral, String> colunaProdutoMaisVendido;
+    @FXML
+    private TableColumn<RelatorioVisaoGeral, Integer> colunaQuantidadeMaisVendida;
+    @FXML
+    private TableColumn<RelatorioVisaoGeral, String> colunaProdutoComEstoqueBaixo;
+    @FXML
+    private TableColumn<RelatorioVisaoGeral, Integer> colunaQuantidadeEstoqueBaixo;
+
+    // Coleção de dados que será exibida na tabela
+    private ObservableList<RelatorioVisaoGeral> dadosRelatorio = FXCollections.observableArrayList();
+
+
     // Método para carregar os dados de cada relatório
     private void carregarDadosVisaoGeral() {
         ObservableList<RelatorioVisaoGeral> dados = FXCollections.observableArrayList();
         try (Connection connection = Database.getConnection()) {
-            String sql = "SELECT SUM(t.Preco * t.Quantidade) AS total_vendas, " +
-                    "SUM(t.Preco) AS total_receitas, " +
-                    "GROUP_CONCAT(p.Descricao ORDER BY SUM(t.Quantidade) DESC LIMIT 5) AS produtos_mais_vendidos, " +
-                    "e.Quantidade AS estoque_minimo " +
+            // Total de vendas no período
+            String sqlVendas = "SELECT SUM(Preco * Quantidade) AS total_vendas " +
+                    "FROM Transacao " +
+                    "WHERE Tipo = 'venda' AND DataHora BETWEEN ? AND ?";
+
+            // Produto mais vendido
+            String sqlProdutoMaisVendido = "SELECT p.Descricao, SUM(t.Quantidade) AS total_vendido " +
                     "FROM Transacao t " +
                     "JOIN Produto p ON t.IdProduto = p.IdProduto " +
-                    "JOIN Estoque e ON e.IdProduto = p.IdProduto " +
-                    "GROUP BY e.Quantidade";
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                dados.add(new RelatorioVisaoGeral(
-                        rs.getString("total_vendas"),
-                        rs.getString("total_receitas"),
-                        rs.getString("produtos_mais_vendidos"),
-                        rs.getString("estoque_minimo")
-                ));
+                    "WHERE t.Tipo = 'venda' " +
+                    "GROUP BY p.Descricao " +
+                    "ORDER BY total_vendido DESC " +
+                    "LIMIT 1";
+
+            // Estoque com itens abaixo do nível mínimo
+            String sqlEstoqueBaixo = "SELECT Descricao, Quantidade " +
+                    "FROM Estoque " +
+                    "WHERE Quantidade < ? " +
+                    "ORDER BY Quantidade ASC";
+
+            double totalVendas = 0.0;
+            String produtoMaisVendido = "Nenhum produto vendido";
+            int quantidadeMaisVendida = 0;
+            String produtoComEstoqueBaixo = "Estoque adequado";
+            int quantidadeEstoqueBaixo = 0;
+
+            // Total de vendas no período
+            try (PreparedStatement stmtVendas = connection.prepareStatement(sqlVendas)) {
+                stmtVendas.setTimestamp(1, Timestamp.valueOf("2024-01-01 00:00:00")); // Exemplo: início do período
+                stmtVendas.setTimestamp(2, Timestamp.valueOf("2024-12-31 23:59:59")); // Exemplo: fim do período
+                ResultSet rsVendas = stmtVendas.executeQuery();
+                if (rsVendas.next()) {
+                    totalVendas = rsVendas.getDouble("total_vendas");
+                }
             }
+
+            // Produto mais vendido
+            try (PreparedStatement stmtProdutoMaisVendido = connection.prepareStatement(sqlProdutoMaisVendido)) {
+                ResultSet rsProdutoMaisVendido = stmtProdutoMaisVendido.executeQuery();
+                if (rsProdutoMaisVendido.next()) {
+                    produtoMaisVendido = rsProdutoMaisVendido.getString("Descricao");
+                    quantidadeMaisVendida = rsProdutoMaisVendido.getInt("total_vendido");
+                }
+            }
+
+            // Estoque com itens abaixo do nível mínimo
+            try (PreparedStatement stmtEstoqueBaixo = connection.prepareStatement(sqlEstoqueBaixo)) {
+                stmtEstoqueBaixo.setInt(1, 10); // Exemplo: nível mínimo de estoque
+                ResultSet rsEstoqueBaixo = stmtEstoqueBaixo.executeQuery();
+                if (rsEstoqueBaixo.next()) {
+                    produtoComEstoqueBaixo = rsEstoqueBaixo.getString("Descricao");
+                    quantidadeEstoqueBaixo = rsEstoqueBaixo.getInt("Quantidade");
+                }
+            }
+
+            dados.add(new RelatorioVisaoGeral(
+                    totalVendas,
+                    produtoMaisVendido,
+                    quantidadeMaisVendida,
+                    produtoComEstoqueBaixo,
+                    quantidadeEstoqueBaixo
+            ));
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Adicionando os dados à tabela ou outra interface visual
         tabelaVisaoGeral.setItems(dados);
-        colunaTotalVendas.setCellValueFactory(cellData -> cellData.getValue().totalVendasProperty());
-        colunaTotalReceitas.setCellValueFactory(cellData -> cellData.getValue().totalReceitasProperty());
-        colunaProdutosMaisVendidos.setCellValueFactory(cellData -> cellData.getValue().produtosMaisVendidosProperty());
-        colunaEstoqueMinimo.setCellValueFactory(cellData -> cellData.getValue().estoqueMinimoProperty());
+        colunaTotalVendas.setCellValueFactory(cellData -> cellData.getValue().totalVendasProperty().asObject());
+        colunaProdutoMaisVendido.setCellValueFactory(cellData -> cellData.getValue().produtoMaisVendidoProperty());
+        colunaQuantidadeMaisVendida.setCellValueFactory(cellData -> cellData.getValue().quantidadeMaisVendidaProperty().asObject());
+        colunaProdutoComEstoqueBaixo.setCellValueFactory(cellData -> cellData.getValue().produtoComEstoqueBaixoProperty());
+        colunaQuantidadeEstoqueBaixo.setCellValueFactory(cellData -> cellData.getValue().quantidadeEstoqueBaixoProperty().asObject());
     }
+
 
     private void carregarDadosTransacoes() {
         ObservableList<RelatorioTransacoes> dados = FXCollections.observableArrayList();
@@ -187,18 +259,23 @@ public class RelatoriosController {
         colunaUsoDesconto.setCellValueFactory(cellData -> cellData.getValue().usoDescontoProperty());
     }
 
+    // Colunas da Tabela Descontos
+    @FXML private TableColumn<RelatorioDescontos, String> colunaTipoDesconto;
+    @FXML private TableColumn<RelatorioDescontos, Double> colunaValorDesconto;
+    @FXML private TableColumn<RelatorioDescontos, Double> colunaPercentualDesconto;
+
     private void carregarDadosDescontos() {
         ObservableList<RelatorioDescontos> dados = FXCollections.observableArrayList();
         try (Connection connection = Database.getConnection()) {
-            String sql = "SELECT Tipo AS tipo_desconto, Valor AS valor_desconto, Percentual AS percentual_desconto " +
+            String sql = "SELECT Tipo AS tipo_desconto, Percentual AS percentual_desconto, PontosMinimos AS pontos_minimos " +
                     "FROM Desconto";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 dados.add(new RelatorioDescontos(
                         rs.getString("tipo_desconto"),
-                        rs.getDouble("valor_desconto"),
-                        rs.getDouble("percentual_desconto")
+                        rs.getDouble("percentual_desconto"),
+                        rs.getInt("pontos_minimos") // Aqui você pode decidir como tratar os pontos mínimos
                 ));
             }
         } catch (SQLException e) {

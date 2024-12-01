@@ -1,34 +1,40 @@
 package com.gerencia.estoque.model.relatorio;
 
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 public class RelatorioVisaoGeral {
-    private final StringProperty totalVendas;
-    private final StringProperty totalReceitas;
-    private final StringProperty produtosMaisVendidos;
-    private final StringProperty estoqueMinimo;
+    private final DoubleProperty totalVendas;
+    private final StringProperty produtoMaisVendido;
+    private final IntegerProperty quantidadeMaisVendida;
+    private final StringProperty produtoComEstoqueBaixo;
+    private final IntegerProperty quantidadeEstoqueBaixo;
 
-    public RelatorioVisaoGeral(String totalVendas, String totalReceitas, String produtosMaisVendidos, String estoqueMinimo) {
-        this.totalVendas = new SimpleStringProperty(totalVendas);
-        this.totalReceitas = new SimpleStringProperty(totalReceitas);
-        this.produtosMaisVendidos = new SimpleStringProperty(produtosMaisVendidos);
-        this.estoqueMinimo = new SimpleStringProperty(estoqueMinimo);
+    public RelatorioVisaoGeral(double totalVendas, String produtoMaisVendido, int quantidadeMaisVendida,
+                               String produtoComEstoqueBaixo, int quantidadeEstoqueBaixo) {
+        this.totalVendas = new SimpleDoubleProperty(totalVendas);
+        this.produtoMaisVendido = new SimpleStringProperty(produtoMaisVendido);
+        this.quantidadeMaisVendida = new SimpleIntegerProperty(quantidadeMaisVendida);
+        this.produtoComEstoqueBaixo = new SimpleStringProperty(produtoComEstoqueBaixo);
+        this.quantidadeEstoqueBaixo = new SimpleIntegerProperty(quantidadeEstoqueBaixo);
     }
 
-    public StringProperty totalVendasProperty() {
+    public DoubleProperty totalVendasProperty() {
         return totalVendas;
     }
 
-    public StringProperty totalReceitasProperty() {
-        return totalReceitas;
+    public StringProperty produtoMaisVendidoProperty() {
+        return produtoMaisVendido;
     }
 
-    public StringProperty produtosMaisVendidosProperty() {
-        return produtosMaisVendidos;
+    public IntegerProperty quantidadeMaisVendidaProperty() {
+        return quantidadeMaisVendida;
     }
 
-    public StringProperty estoqueMinimoProperty() {
-        return estoqueMinimo;
+    public StringProperty produtoComEstoqueBaixoProperty() {
+        return produtoComEstoqueBaixo;
+    }
+
+    public IntegerProperty quantidadeEstoqueBaixoProperty() {
+        return quantidadeEstoqueBaixo;
     }
 }
