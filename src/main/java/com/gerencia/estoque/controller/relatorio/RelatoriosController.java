@@ -9,14 +9,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class RelatoriosController {
 
@@ -60,11 +64,45 @@ public class RelatoriosController {
     // Métodos de Inicialização
     @FXML
     public void initialize() {
+        formatarColunaDataTransacao(colunaDataHora);
+        formatarColunaDataDemanda(colunaUltimaDataDemanda);
+
         carregarDadosTransacoes();
         carregarDadosDemanda();
         carregarDadosDescontos();
         carregarDadosPontuacaoClientes();
+
+        centralizarColunas();
+
     }
+
+    // Método para configurar o alinhamento das colunas das Tabelas
+    private void centralizarColunas() {
+        // Centraliza as colunas da Tabela de Transações
+        colunaIdTransacao.setStyle("-fx-alignment: CENTER;");
+        colunaProduto.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidade.setStyle("-fx-alignment: CENTER;");
+        colunaPreco.setStyle("-fx-alignment: CENTER;");
+        colunaDataHora.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela de Demanda
+        colunaClienteDemanda.setStyle("-fx-alignment: CENTER;");
+        colunaItemDemandado.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeDemandada.setStyle("-fx-alignment: CENTER;");
+        colunaUltimaDataDemanda.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela de Descontos
+        colunaIdDesconto.setStyle("-fx-alignment: CENTER;");
+        colunaDescricaoDesconto.setStyle("-fx-alignment: CENTER;");
+        colunaQtdAplicada.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela de Pontuação de Clientes
+        colunaIdClientePontuacao.setStyle("-fx-alignment: CENTER;");
+        colunaNomeClientePontuacao.setStyle("-fx-alignment: CENTER;");
+        colunaPontuacao.setStyle("-fx-alignment: CENTER;");
+        colunaComprasFeitas.setStyle("-fx-alignment: CENTER;");
+    }
+
 
     // Método para carregar dados de transações
     private void carregarDadosTransacoes() {
@@ -173,11 +211,57 @@ public class RelatoriosController {
         colunaComprasFeitas.setCellValueFactory(cellData -> cellData.getValue().comprasFeitasProperty().asObject()); // Atualização para a nova coluna
     }
 
+    private void formatarColunaDataTransacao(TableColumn<RelatorioTransacoes, String> coluna) {
+        coluna.setCellFactory(new Callback<TableColumn<RelatorioTransacoes, String>, TableCell<RelatorioTransacoes, String>>() {
+            @Override
+            public TableCell<RelatorioTransacoes, String> call(TableColumn<RelatorioTransacoes, String> param) {
+                return new TableCell<RelatorioTransacoes, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            // Remove a parte dos nanossegundos da string de data
+                            String dataFormatada = item.split("\\.")[0]; // Divide a string na parte dos nanossegundos
+                            setText(dataFormatada); // Exibe a data sem os nanossegundos
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    private void formatarColunaDataDemanda(TableColumn<RelatorioDemanda, String> coluna) {
+        coluna.setCellFactory(new Callback<TableColumn<RelatorioDemanda, String>, TableCell<RelatorioDemanda, String>>() {
+            @Override
+            public TableCell<RelatorioDemanda, String> call(TableColumn<RelatorioDemanda, String> param) {
+                return new TableCell<RelatorioDemanda, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            // Remove a parte dos nanossegundos da string de data
+                            String dataFormatada = item.split("\\.")[0]; // Divide a string na parte dos nanossegundos
+                            setText(dataFormatada); // Exibe a data sem os nanossegundos
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+
+
+
     // Métodos para ações dos botões
     @FXML
     private void handleMaisVendidos(MouseEvent event) {
-        // Implementar lógica para ver mais vendidos
+
     }
+
 
     @FXML
     private void handleMaisComprados(MouseEvent event) {
