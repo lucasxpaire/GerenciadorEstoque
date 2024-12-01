@@ -4,14 +4,18 @@ import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.relatorio.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,12 +24,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class RelatoriosController {
-    @FXML private TableView<RelatorioTransacoes> tabelaTransacoes;
+    @FXML private TableView<RelatorioTransacoes> tabelaVendas;
+    @FXML private TableView<RelatorioTransacoes> tabelaCompra;
     @FXML private TableColumn<RelatorioTransacoes, Integer> colunaIdTransacao;
     @FXML private TableColumn<RelatorioTransacoes, String> colunaProduto;
     @FXML private TableColumn<RelatorioTransacoes, Integer> colunaQuantidade;
     @FXML private TableColumn<RelatorioTransacoes, Double> colunaPreco;
     @FXML private TableColumn<RelatorioTransacoes, String> colunaDataHora;
+
+    @FXML private TableColumn<RelatorioTransacoes, Integer> colunaIdTransacaoCompra;
+    @FXML private TableColumn<RelatorioTransacoes, String> colunaProdutoCompra;
+    @FXML private TableColumn<RelatorioTransacoes, Integer> colunaQuantidadeCompra;
+    @FXML private TableColumn<RelatorioTransacoes, Double> colunaPrecoCompra;
+    @FXML private TableColumn<RelatorioTransacoes, String> colunaDataHoraCompra;
 
     @FXML private TableView<RelatorioDemanda> tabelaDemanda;
     @FXML private TableColumn<RelatorioDemanda, String> colunaClienteDemanda;
@@ -58,6 +69,8 @@ public class RelatoriosController {
     @FXML
     public void initialize() {
         formatarColunaDataTransacao(colunaDataHora);
+        formatarColunaDataTransacao(colunaDataHoraCompra);
+
         formatarColunaDataDemanda(colunaUltimaDataDemanda);
 
         carregarDadosTransacoes();
@@ -75,12 +88,19 @@ public class RelatoriosController {
 
     // Método para configurar o alinhamento das colunas das Tabelas
     private void centralizarColunas() {
-        // Centraliza as colunas da Tabela de Transações
+        // Centraliza as colunas da Tabela de Vendas
         colunaIdTransacao.setStyle("-fx-alignment: CENTER;");
         colunaProduto.setStyle("-fx-alignment: CENTER;");
         colunaQuantidade.setStyle("-fx-alignment: CENTER;");
         colunaPreco.setStyle("-fx-alignment: CENTER;");
         colunaDataHora.setStyle("-fx-alignment: CENTER;");
+
+        // Centraliza as colunas da Tabela de Compras
+        colunaIdTransacaoCompra.setStyle("-fx-alignment: CENTER;");
+        colunaProdutoCompra.setStyle("-fx-alignment: CENTER;");
+        colunaQuantidadeCompra.setStyle("-fx-alignment: CENTER;");
+        colunaPrecoCompra.setStyle("-fx-alignment: CENTER;");
+        colunaDataHoraCompra.setStyle("-fx-alignment: CENTER;");
 
         // Centraliza as colunas da Tabela de Demanda
         colunaClienteDemanda.setStyle("-fx-alignment: CENTER;");
@@ -111,31 +131,57 @@ public class RelatoriosController {
         colunaQuantidadeAplicada.setStyle("-fx-alignment: CENTER;");
     }
 
-    // Método para carregar dados de transações
     private void carregarDadosTransacoes() {
-        ObservableList<RelatorioTransacoes> dados = FXCollections.observableArrayList();
+        ObservableList<RelatorioTransacoes> dadosVendas = FXCollections.observableArrayList();
+        ObservableList<RelatorioTransacoes> dadosCompras = FXCollections.observableArrayList();
+
         try (Connection connection = Database.getConnection()) {
-            String sql = "SELECT IdTransacao, Descricao, Quantidade, Preco, DataHora FROM Transacao";
+            // Dados de Transações Vendas
+            String sqlVendas = "SELECT IdTransacao, Descricao, Quantidade, Preco, DataHora FROM Transacao WHERE Tipo = 'Venda'";
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                dados.add(new RelatorioTransacoes(
-                        rs.getInt("IdTransacao"),
-                        rs.getString("Descricao"),
-                        rs.getInt("Quantidade"),
-                        rs.getDouble("Preco"),
-                        rs.getString("DataHora")
+            ResultSet rsVendas = stmt.executeQuery(sqlVendas);
+            while (rsVendas.next()) {
+                dadosVendas.add(new RelatorioTransacoes(
+                        rsVendas.getInt("IdTransacao"),
+                        rsVendas.getString("Descricao"),
+                        rsVendas.getInt("Quantidade"),
+                        rsVendas.getDouble("Preco"),
+                        rsVendas.getString("DataHora")
                 ));
             }
+
+            // Dados de Transações Compras
+            String sqlCompras = "SELECT IdTransacao, Descricao, Quantidade, Preco, DataHora FROM Transacao WHERE Tipo = 'Compra'";
+            ResultSet rsCompras = stmt.executeQuery(sqlCompras);
+            while (rsCompras.next()) {
+                dadosCompras.add(new RelatorioTransacoes(
+                        rsCompras.getInt("IdTransacao"),
+                        rsCompras.getString("Descricao"),
+                        rsCompras.getInt("Quantidade"),
+                        rsCompras.getDouble("Preco"),
+                        rsCompras.getString("DataHora")
+                ));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        tabelaTransacoes.setItems(dados);
+
+        // Configura dados na tabela de Vendas
+        tabelaVendas.setItems(dadosVendas);
         colunaIdTransacao.setCellValueFactory(cellData -> cellData.getValue().idTransacaoProperty().asObject());
         colunaProduto.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
         colunaQuantidade.setCellValueFactory(cellData -> cellData.getValue().quantidadeProperty().asObject());
         colunaPreco.setCellValueFactory(cellData -> cellData.getValue().precoProperty().asObject());
         colunaDataHora.setCellValueFactory(cellData -> cellData.getValue().dataHoraProperty());
+
+        // Configura dados na tabela de Compras
+        tabelaCompra.setItems(dadosCompras);
+        colunaIdTransacaoCompra.setCellValueFactory(cellData -> cellData.getValue().idTransacaoProperty().asObject());
+        colunaProdutoCompra.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
+        colunaQuantidadeCompra.setCellValueFactory(cellData -> cellData.getValue().quantidadeProperty().asObject());
+        colunaPrecoCompra.setCellValueFactory(cellData -> cellData.getValue().precoProperty().asObject());
+        colunaDataHoraCompra.setCellValueFactory(cellData -> cellData.getValue().dataHoraProperty());
     }
 
     // Método para carregar dados de demanda
@@ -349,5 +395,30 @@ public class RelatoriosController {
         // Mapeamento das colunas da tabela (supondo que você já tenha feito a configuração das colunas no FXML)
         colunaDescricaoDescontoAplicado.setCellValueFactory(cellData -> cellData.getValue().descricaoDescontoProperty());
         colunaQuantidadeAplicada.setCellValueFactory(cellData -> cellData.getValue().quantidadeAplicadaProperty().asObject());
+    }
+
+    @FXML
+    private void voltar(ActionEvent event) {
+        // Obtém o Stage atual
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        // Carrega o arquivo FXML para a cena de retorno
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/painel-prop/painel-prop.fxml"));
+            Parent root = loader.load();
+
+            // Cria uma nova cena com o root carregado
+            Scene scene = new Scene(root);
+
+            // Define a nova cena no Stage atual
+            stage.setScene(scene);
+
+            // Define para tela cheia
+            stage.setFullScreen(true);
+            stage.setFullScreenExitHint("");  // Opcional: Remove a dica de saída da tela cheia
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
