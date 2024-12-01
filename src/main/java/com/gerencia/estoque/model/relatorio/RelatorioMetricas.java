@@ -1,6 +1,8 @@
 package com.gerencia.estoque.model.relatorio;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -10,11 +12,13 @@ public class RelatorioMetricas {
     private final StringProperty produto;
     private final IntegerProperty quantidadeVendida;
     private final IntegerProperty quantidadeComprada;
+    private final DoubleProperty precoTotal;
 
-    public RelatorioMetricas(String produto, int quantidadeVendida, int quantidadeComprada) {
+    public RelatorioMetricas(String produto, int quantidadeVendida, int quantidadeComprada, double precoTotal) {
         this.produto = new SimpleStringProperty(produto);
         this.quantidadeVendida = new SimpleIntegerProperty(quantidadeVendida);
         this.quantidadeComprada = new SimpleIntegerProperty(quantidadeComprada);
+        this.precoTotal = new SimpleDoubleProperty(precoTotal);
     }
 
     // Getters e Setters
@@ -52,5 +56,17 @@ public class RelatorioMetricas {
 
     public IntegerProperty quantidadeCompradaProperty() {
         return quantidadeComprada;
+    }
+
+    public double getPrecoTotal() {
+        return precoTotal.get();
+    }
+
+    public void setPrecoTotal(double precoTotal) {
+        this.precoTotal.set(precoTotal);
+    }
+
+    public DoubleProperty precoTotalProperty() {
+        return precoTotal;
     }
 }
