@@ -447,27 +447,36 @@ public class RelatoriosController {
 
     @FXML
     private void gerarPdfVendas(ActionEvent event){
-        exportarTabelaParaPDF(tabelaVendas, "Relatório de Vendas", "relatorio_vendas.pdf");
+        exportarTabelaParaPDF(tabelaVendas, "Relatório de Vendas", "Vendas.pdf");
     }
     @FXML
     private void gerarPdfCompras(ActionEvent event){
-        exportarTabelaParaPDF(tabelaCompra, "Relatório de Compras", "relatorio_compras.pdf");
+        exportarTabelaParaPDF(tabelaCompra, "Relatório de Compras", "Compras.pdf");
     }
     @FXML
     private void gerarPdfDemandas(ActionEvent event){
-        exportarTabelaParaPDF(tabelaDemanda, "Relatório de Demandas", "relatorio_demandas.pdf");
+        exportarTabelaParaPDF(tabelaDemanda, "Relatório de Demandas", "ProdutosDemandados.pdf");
     }
     @FXML
+    private void gerarPdfMaisDemandas(ActionEvent event){
+        exportarTabelaParaPDF(tabelaItensMaisDemandados, "Relatório de Demandas", "ProdutosMaisDemandados.pdf");
+    }
+
+    @FXML
     private void gerarPdfDescontos(ActionEvent event){
-        exportarTabelaParaPDF(tabelaDescontos, "Relatório de Descontos", "relatorio_descontos.pdf");
+        exportarTabelaParaPDF(tabelaDescontos, "Relatório de Descontos", "Descontos.pdf");
+    }
+    @FXML
+    private void gerarPdfMaisDescontos(ActionEvent event){
+        exportarTabelaParaPDF(tabelaDescontosMaisAplicados, "Relatório de Descontos", "DescontosMaisAplicados.pdf");
     }
     @FXML
     private void gerarPdfProdutosVendidos(ActionEvent event){
-        exportarTabelaParaPDF(tabelaProdutosMaisVendidos, "Relatório de Produtos mais Vendidos", "relatorio_produtosmaisvendidos.pdf");
+        exportarTabelaParaPDF(tabelaProdutosMaisVendidos, "Relatório de Produtos mais Vendidos", "ProdutosMaisVendidos.pdf");
     }
     @FXML
     private void gerarPdfProdutosComprados(ActionEvent event){
-        exportarTabelaParaPDF(tabelaCompra, "Relatório de Produtos mais Comprados", "relatorio_produtosmaiscomprados.pdf");
+        exportarTabelaParaPDF(tabelaCompra, "Relatório de Produtos mais Comprados", "ProdutosMaisComprados.pdf");
     }
 
     private <T> void exportarTabelaParaPDF(TableView<T> tabela, String tituloPDF, String nomeArquivo) {

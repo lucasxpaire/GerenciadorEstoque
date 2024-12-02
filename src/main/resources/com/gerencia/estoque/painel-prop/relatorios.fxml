@@ -51,8 +51,6 @@
                <HBox alignment="CENTER" prefHeight="20.0" prefWidth="311.0" spacing="20.0">
                   <children>
                           <Button onAction="#gerarPdfCompras" text="Gerar PDF de Compras" />
-      
-                          <!-- Botão Voltar -->
                           <Button fx:id="btnVoltarTransacoes" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
                           <Button onAction="#gerarPdfVendas" text="Gerar PDF de Vendas" />
                   </children>
@@ -90,10 +88,9 @@
                     </TableView>
                <HBox alignment="CENTER" prefHeight="25.0" prefWidth="219.0" spacing="20.0">
                   <children>
-      
-                          <!-- Botão Voltar -->
+                          <Button onAction="#gerarPdfDemandas" text="Gerar PDF de Produtos Demandados" />
                           <Button fx:id="btnVoltarDemandas" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
-                          <Button onAction="#gerarPdfDemandas" text="Gerar PDF de Demandas" />
+                          <Button onAction="#gerarPdfMaisDemandas" text="Gerar PDF de Produtos mais Demandados" />
                   </children>
                </HBox>
                 </VBox>
@@ -128,10 +125,9 @@
                     </TableView>
                <HBox alignment="TOP_CENTER" prefHeight="16.0" prefWidth="357.0" spacing="20.0">
                   <children>
-      
-                          <!-- Botão Voltar -->
-                          <Button fx:id="btnVoltarDescontos" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
-                          <Button alignment="CENTER" onAction="#gerarPdfDescontos" text="Gerar PDF de Descontos" />
+                      <Button alignment="CENTER" onAction="#gerarPdfDescontos" text="Gerar PDF de Descontos" />
+                      <Button fx:id="btnVoltarDescontos" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
+                      <Button alignment="CENTER" onAction="#gerarPdfMaisDescontos" text="Gerar PDF de Descontos mais Aplicados" />
                   </children>
                </HBox>
                 </VBox>
