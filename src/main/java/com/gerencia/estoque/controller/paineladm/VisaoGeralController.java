@@ -159,7 +159,6 @@ public class VisaoGeralController {
 
     private void carregarTela(String caminhoFXML, String titulo, ActionEvent event) {
         try {
-            // Obtem a janela atual a partir do evento, se disponível
             Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
             Parent root = FXMLLoader.load(getClass().getResource(caminhoFXML));
             Scene scene = new Scene(root);
@@ -173,7 +172,6 @@ public class VisaoGeralController {
         }
     }
 
-    // Método para mostrar alertas
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);

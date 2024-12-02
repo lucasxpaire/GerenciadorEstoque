@@ -19,22 +19,14 @@ public class EditarItemController {
     @FXML
     private TextField campoPreco;
 
-    private Estoque itemEstoque; // Item que está sendo editado
+    private Estoque itemEstoque;
 
-    /**
-     * Define o item do estoque a ser editado e preenche os campos com os valores atuais.
-     *
-     * @param itemEstoque Item selecionado na tabela.
-     */
     public void setItemEstoque(Estoque itemEstoque) {
         this.itemEstoque = itemEstoque;
         campoDescricao.setText(itemEstoque.getDescricao());
         campoPreco.setText(String.valueOf(itemEstoque.getPreco()));
     }
 
-    /**
-     * Salva as alterações feitas no item do estoque.
-     */
     @FXML
     private void salvarAlteracoes() {
         String novaDescricao = campoDescricao.getText();
@@ -76,38 +68,25 @@ public class EditarItemController {
         }
     }
 
-    /**
-     * Cancela a edição e fecha a janela.
-     */
     @FXML
     private void cancelarEdicao() {
         fecharJanela();
     }
 
-    /**
-     * Fecha a janela atual.
-     */
     private void fecharJanela() {
         Stage stage = (Stage) campoDescricao.getScene().getWindow();
         stage.close();
     }
 
-    /**
-     * Exibe um alerta ao usuário.
-     *
-     * @param titulo   Título do alerta.
-     * @param mensagem Mensagem do alerta.
-     */
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
-        // Obtendo a janela principal para configurar o alerta acima dela
         Stage stage = (Stage) campoDescricao.getScene().getWindow();
-        alert.initOwner(stage);  // Define o dono da janela do alerta
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        alert.showAndWait();  // Exibe o alerta
+        alert.showAndWait();
     }
 }

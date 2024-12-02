@@ -4,7 +4,6 @@ import com.gerencia.estoque.dao.EstoqueDAO;
 import com.gerencia.estoque.model.estoque.Estoque;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
@@ -27,11 +26,10 @@ public class ComprarMaisQuantidadeController {
             EstoqueDAO estoqueDAO = new EstoqueDAO();
             List<Estoque> estoqueList = estoqueDAO.buscarEstoque();
 
-            // Cria uma lista observável com os nomes dos produtos para o ComboBox
             ObservableList<String> produtos = FXCollections.observableArrayList();
 
             for (Estoque estoque : estoqueList) {
-                produtos.add(estoque.getDescricao());  // ou estoque.getIdProduto() se quiser usar o ID
+                produtos.add(estoque.getDescricao());
             }
 
             comboProduto.setItems(produtos);
@@ -92,12 +90,9 @@ public class ComprarMaisQuantidadeController {
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
-
-        // Obtendo a janela principal para configurar o alerta acima dela
         Stage stage = (Stage) quantidadeField.getScene().getWindow();
-        alert.initOwner(stage);  // Define o dono da janela do alerta
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
-
-        alert.showAndWait();  // Exibe o alerta
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        alert.showAndWait();
     }
 }

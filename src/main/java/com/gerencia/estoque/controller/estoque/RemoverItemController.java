@@ -82,11 +82,10 @@ public class RemoverItemController {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
 
-        // Obtendo a janela principal para configurar o alerta acima dela
         Stage stage = (Stage) quantidadeField.getScene().getWindow();
-        alert.initOwner(stage);  // Define o dono da janela do alerta
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        alert.showAndWait();  // Exibe o alerta
+        alert.showAndWait();
     }
 }

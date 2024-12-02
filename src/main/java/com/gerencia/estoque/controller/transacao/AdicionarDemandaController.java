@@ -76,12 +76,10 @@ public class AdicionarDemandaController {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
 
-        // Obtém a janela principal para centralizar o alerta
         Stage stage = (Stage) tfDescricaoProduto.getScene().getWindow();
         alert.initOwner(stage);
         alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        // Exibe o alerta e espera a interação do usuário
         alert.showAndWait();
     }
 

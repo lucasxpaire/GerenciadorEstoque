@@ -44,12 +44,9 @@ public class EstoqueController {
         carregarProdutosEstoque();
     }
 
-    // Dentro do método configurarTabela()
     private void configurarTabela() {
-        // Configurações das colunas da tabela
         colunaDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
 
-        // Alinhamento no centro para a coluna Descrição
         colunaDescricao.setCellFactory(column -> {
             return new TableCell<Estoque, String>() {
                 @Override
@@ -65,7 +62,6 @@ public class EstoqueController {
             };
         });
 
-        // Alinhar o preço ao centro
         colunaPreco.setCellValueFactory(new PropertyValueFactory<>("preco"));
         colunaPreco.setCellFactory(column -> {
             return new TableCell<Estoque, Double>() {
@@ -75,14 +71,13 @@ public class EstoqueController {
                     if (empty) {
                         setText(null);
                     } else {
-                        setText(String.format("%.2f", item)); // Formata o preço com 2 casas decimais
+                        setText(String.format("%.2f", item));
                         setStyle("-fx-alignment: CENTER;");
                     }
                 }
             };
         });
 
-        // Alinhar a quantidade ao centro
         colunaQuantidade.setCellValueFactory(new PropertyValueFactory<>("quantidade"));
         colunaQuantidade.setCellFactory(column -> {
             return new TableCell<Estoque, Integer>() {
@@ -99,11 +94,9 @@ public class EstoqueController {
             };
         });
 
-        // Inicializa a lista e associa à tabela
         listaEstoque = FXCollections.observableArrayList();
         tabelaEstoque.setItems(listaEstoque);
     }
-
 
     private void carregarProdutosEstoque() {
         listaEstoque.clear();
@@ -190,7 +183,7 @@ public class EstoqueController {
             stage.initOwner(((javafx.scene.Node) event.getSource()).getScene().getWindow());
             stage.showAndWait();
 
-            carregarProdutosEstoque(); // Recarrega a tabela após a edição
+            carregarProdutosEstoque();
         } catch (IOException e) {
             mostrarAlerta("Erro", "Falha ao abrir a tela de edição: " + e.getMessage());
             e.printStackTrace();
@@ -229,21 +222,17 @@ public class EstoqueController {
         }
     }
 
-
-
-
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
 
-        // Obtendo a janela principal para configurar o alerta acima dela
         Stage stage = (Stage) tabelaEstoque.getScene().getWindow();
-        alert.initOwner(stage);  // Define o dono da janela do alerta
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        alert.showAndWait();  // Exibe o alerta
+        alert.showAndWait();
     }
 
     @FXML

@@ -29,7 +29,7 @@ public class ManterDescontosController {
     @FXML
     private TextField campoDescricao;
     @FXML
-    private TextField campoPontosMinimos; // Novo campo para pontos mínimos do desconto
+    private TextField campoPontosMinimos;
 
     @FXML
     private TableView<Desconto> tableDescontos;
@@ -89,7 +89,7 @@ public class ManterDescontosController {
                         rs.getString("Tipo"),
                         rs.getDouble("Percentual"),
                         rs.getString("Descricao"),
-                        rs.getInt("PontosMinimos") // Novo campo
+                        rs.getInt("PontosMinimos")
                 );
                 listaDescontos.add(desconto);
             }
@@ -104,7 +104,7 @@ public class ManterDescontosController {
         String tipo = campoTipo.getText();
         String percentualTexto = campoPercentual.getText();
         String descricao = campoDescricao.getText();
-        String pontosTexto = campoPontosMinimos.getText(); // Novo campo
+        String pontosTexto = campoPontosMinimos.getText();
 
         if (tipo.isEmpty() || percentualTexto.isEmpty() || pontosTexto.isEmpty()) {
             mostrarAlerta("Erro", "Os campos 'Tipo', 'Percentual' e 'Pontos Mínimos' são obrigatórios.", Alert.AlertType.WARNING);
@@ -121,7 +121,7 @@ public class ManterDescontosController {
                 stmt.setString(1, tipo);
                 stmt.setDouble(2, percentual);
                 stmt.setString(3, descricao);
-                stmt.setInt(4, pontosMinimos); // Novo campo
+                stmt.setInt(4, pontosMinimos);
                 stmt.executeUpdate();
                 mostrarAlerta("Sucesso", "Desconto adicionado com sucesso.", Alert.AlertType.INFORMATION);
                 carregarDescontos();
@@ -146,7 +146,7 @@ public class ManterDescontosController {
         String tipo = campoTipo.getText();
         String percentualTexto = campoPercentual.getText();
         String descricao = campoDescricao.getText();
-        String pontosTexto = campoPontosMinimos.getText(); // Novo campo
+        String pontosTexto = campoPontosMinimos.getText();
 
         if (tipo.isEmpty() || percentualTexto.isEmpty() || pontosTexto.isEmpty()) {
             mostrarAlerta("Erro", "Os campos 'Tipo', 'Percentual' e 'Pontos Mínimos' são obrigatórios.", Alert.AlertType.WARNING);
@@ -163,7 +163,7 @@ public class ManterDescontosController {
                 stmt.setString(1, tipo);
                 stmt.setDouble(2, percentual);
                 stmt.setString(3, descricao);
-                stmt.setInt(4, pontosMinimos); // Novo campo
+                stmt.setInt(4, pontosMinimos);
                 stmt.setInt(5, descontoSelecionado.getIdDesconto());
                 stmt.executeUpdate();
                 mostrarAlerta("Sucesso", "Desconto editado com sucesso.", Alert.AlertType.INFORMATION);
@@ -234,6 +234,6 @@ public class ManterDescontosController {
         campoTipo.clear();
         campoPercentual.clear();
         campoDescricao.clear();
-        campoPontosMinimos.clear(); // Limpa o campo de pontos mínimos
+        campoPontosMinimos.clear();
     }
 }

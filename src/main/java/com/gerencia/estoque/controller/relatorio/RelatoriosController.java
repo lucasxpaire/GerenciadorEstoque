@@ -3,15 +3,11 @@ package com.gerencia.estoque.controller.relatorio;
 import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.relatorio.*;
 
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.layout.element.Table;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -22,7 +18,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Cell;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -37,14 +32,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-//import com.itextpdf.kernel.pdf.PdfWriter;
-//import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Table;
-//import com.itextpdf.layout.element.Cell;
-import com.itextpdf.kernel.pdf.PdfDocument;
-
-import java.io.FileOutputStream;
 
 public class RelatoriosController {
     @FXML private TableView<RelatorioTransacoes> tabelaVendas;
@@ -415,30 +402,24 @@ public class RelatoriosController {
             e.printStackTrace();
         }
         tabelaDescontosMaisAplicados.setItems(dados);
-        // Mapeamento das colunas da tabela (supondo que você já tenha feito a configuração das colunas no FXML)
         colunaDescricaoDescontoAplicado.setCellValueFactory(cellData -> cellData.getValue().descricaoDescontoProperty());
         colunaQuantidadeAplicada.setCellValueFactory(cellData -> cellData.getValue().quantidadeAplicadaProperty().asObject());
     }
 
     @FXML
     private void voltar(ActionEvent event) {
-        // Obtém o Stage atual
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        // Carrega o arquivo FXML para a cena de retorno
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gerencia/estoque/painel-prop/painel-prop.fxml"));
             Parent root = loader.load();
 
-            // Cria uma nova cena com o root carregado
             Scene scene = new Scene(root);
 
-            // Define a nova cena no Stage atual
             stage.setScene(scene);
 
-            // Define para tela cheia
             stage.setFullScreen(true);
-            stage.setFullScreenExitHint("");  // Opcional: Remove a dica de saída da tela cheia
+            stage.setFullScreenExitHint("");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -593,7 +574,6 @@ public class RelatoriosController {
                 document.add(pdfTable);
                 document.close();
 
-                // Exibe o caminho onde o PDF foi gerado
                 System.out.println("PDF gerado em: " + caminhoArquivo);
             }
 

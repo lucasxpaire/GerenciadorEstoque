@@ -3,7 +3,6 @@ package com.gerencia.estoque.controller.estoque;
 import com.gerencia.estoque.dao.EstoqueDAO;
 
 import com.gerencia.estoque.model.estoque.Estoque;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -73,12 +72,10 @@ public class AdicionarNovoItemController {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
 
-        // Obtendo a janela principal para configurar o alerta acima dela
         Stage stage = (Stage) descricaoField.getScene().getWindow();
-        alert.initOwner(stage);  // Define o dono da janela do alerta
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);  // Torna o alerta modal (na frente da janela principal)
-
-        alert.showAndWait();  // Exibe o alerta
+        alert.initOwner(stage);
+        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        alert.showAndWait();
     }
 
 }

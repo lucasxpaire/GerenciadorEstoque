@@ -31,10 +31,6 @@ public class AdicionarDescontoController {
         alert.initOwner(stage);
         alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        // Maximiza a janela principal para garantir que o alerta esteja visível
-        //stage.setMaximized(true);
-
-        // Exibe o alerta
         alert.showAndWait();
     }
 
