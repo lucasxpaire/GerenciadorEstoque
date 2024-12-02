@@ -58,7 +58,7 @@ public class AjudaController {
 
     @FXML
     public void voltar(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/login.fxml", "Login", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Login", event);
     }
 
 
