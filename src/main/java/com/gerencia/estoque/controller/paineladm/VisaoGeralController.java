@@ -1,98 +1,165 @@
 package com.gerencia.estoque.controller.paineladm;
 
-import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.text.Text;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
-
-import javafx.scene.chart.LineChart;
+import java.sql.*;
+import com.gerencia.estoque.dao.Database;
+import javafx.stage.Stage;
 
 public class VisaoGeralController {
 
     @FXML
     private PieChart estoquePieChart;
-
     @FXML
     private BarChart<String, Number> movimentacaoBarChart;
-
     @FXML
     private LineChart<String, Number> vendasSemanaisLineChart;
-
     @FXML
-    private Text totalVendasText;
+    private Label totalVendasText;
 
-    @FXML
+    private Connection connection;
+
     public void initialize() {
-        carregarDadosEstoque();
-        carregarDadosMovimentacao();
-        carregarDadosVendasSemanais();
-        atualizarTotalVendas(25000.00); // Exemplo de total de vendas
+        try {
+            connection = Database.getConnection();
+            carregarEstoque();
+            carregarMovimentacao();
+            carregarVendasSemanais();
+            carregarTotalVendas();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void carregarDadosEstoque() {
-        estoquePieChart.getData().addAll(
-                new PieChart.Data("Produto A", 30),
-                new PieChart.Data("Produto B", 20),
-                new PieChart.Data("Produto C", 50)
+    private void carregarEstoque() {
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
-        );
+        // Query para obter os dados de estoque
+        String sql = "SELECT e.Descricao, e.Quantidade FROM Estoque e";
+
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String descricao = rs.getString("Descricao");
+                int quantidade = rs.getInt("Quantidade");
+                pieChartData.add(new PieChart.Data(descricao, quantidade));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        estoquePieChart.setData(pieChartData);
     }
 
-    private void carregarDadosMovimentacao() {
+    private void carregarMovimentacao() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Movimentação");
+        series.setName("Produtos com Maior Movimentação");
 
-        // Adiciona cada produto com uma cor específica
-        XYChart.Data<String, Number> produtoA = new XYChart.Data<>("Produto A", 200);
-        XYChart.Data<String, Number> produtoB = new XYChart.Data<>("Produto B", 150);
-        XYChart.Data<String, Number> produtoC = new XYChart.Data<>("Produto C", 300);
+        // Query para obter a movimentação dos produtos
+        String sql = "SELECT p.Descricao, SUM(t.Quantidade) as QuantidadeMovimentada " +
+                "FROM Transacao t " +
+                "JOIN Produto p ON t.IdProduto = p.IdProduto " +
+                "GROUP BY p.Descricao " +
+                "ORDER BY QuantidadeMovimentada DESC LIMIT 10"; // Top 10 produtos
 
-        // Define cores específicas para cada barra
-        produtoA.nodeProperty().addListener((obs, oldNode, newNode) -> newNode.setStyle("-fx-bar-fill: #E46434;")); // Laranja
-        produtoB.nodeProperty().addListener((obs, oldNode, newNode) -> newNode.setStyle("-fx-bar-fill: #FB8C00;")); // Laranja
-        produtoC.nodeProperty().addListener((obs, oldNode, newNode) -> newNode.setStyle("-fx-bar-fill: #43A047;")); // Verde
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String descricao = rs.getString("Descricao");
+                int quantidadeMovimentada = rs.getInt("QuantidadeMovimentada");
+                series.getData().add(new XYChart.Data<>(descricao, quantidadeMovimentada));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        // Adiciona os dados ao gráfico
-        series.getData().addAll(produtoA, produtoB, produtoC);
+        movimentacaoBarChart.getData().clear();
         movimentacaoBarChart.getData().add(series);
     }
 
-
-    private void carregarDadosVendasSemanais() {
+    private void carregarVendasSemanais() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Produto Mais Vendido");
+        series.setName("Vendas Semanais");
 
-        series.getData().add(new XYChart.Data<>("Segunda", 50));
-        series.getData().add(new XYChart.Data<>("Terça", 60));
-        series.getData().add(new XYChart.Data<>("Quarta", 70));
-        series.getData().add(new XYChart.Data<>("Quinta", 65));
-        series.getData().add(new XYChart.Data<>("Sexta", 80));
-        series.getData().add(new XYChart.Data<>("Sábado", 120));
-        series.getData().add(new XYChart.Data<>("Domingo", 90));
+        // Obter o ID do produto mais vendido
+        String produtoMaisVendidoSql = "SELECT t.IdProduto, SUM(t.Quantidade) as TotalVendas " +
+                "FROM Transacao t " +
+                "GROUP BY t.IdProduto " +
+                "ORDER BY TotalVendas DESC LIMIT 1";
 
+        int idProdutoMaisVendido = 0;
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(produtoMaisVendidoSql)) {
+            if (rs.next()) {
+                idProdutoMaisVendido = rs.getInt("IdProduto");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Obter as vendas semanais do produto mais vendido
+        if (idProdutoMaisVendido > 0) {
+            String vendasSemanaisSql = "SELECT EXTRACT(DOW FROM t.DataHora) AS DiaSemana, SUM(t.Quantidade) AS QuantidadeVendida " +
+                    "FROM Transacao t " +
+                    "WHERE t.IdProduto = ? " +
+                    "GROUP BY DiaSemana ORDER BY DiaSemana";
+
+            try (PreparedStatement stmt = connection.prepareStatement(vendasSemanaisSql)) {
+                stmt.setInt(1, idProdutoMaisVendido);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        String diaSemana = getDiaDaSemana(rs.getInt("DiaSemana"));
+                        int quantidadeVendida = rs.getInt("QuantidadeVendida");
+                        series.getData().add(new XYChart.Data<>(diaSemana, quantidadeVendida));
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        vendasSemanaisLineChart.getData().clear();
         vendasSemanaisLineChart.getData().add(series);
     }
 
-    private void atualizarTotalVendas(double total) {
-        totalVendasText.setText(String.format("Total de Vendas: R$ %.2f", total));
+    private void carregarTotalVendas() {
+        // Query para obter o total de vendas
+        String sql = "SELECT SUM(t.Preco * t.Quantidade) AS TotalVendas " +
+                "FROM Transacao t";
+
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                double totalVendas = rs.getDouble("TotalVendas");
+                totalVendasText.setText("Total de Vendas: R$ " + String.format("%.2f", totalVendas));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getDiaDaSemana(int index) {
+        String[] dias = {"Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"};
+        return dias[index];
     }
 
     @FXML
     public void voltar(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Painel de Controle do Proprietário", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/painel-prop.fxml", "Login", event);
     }
 
     private void carregarTela(String caminhoFXML, String titulo, ActionEvent event) {
         try {
+            // Obtem a janela atual a partir do evento, se disponível
             Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
             Parent root = FXMLLoader.load(getClass().getResource(caminhoFXML));
             Scene scene = new Scene(root);
@@ -106,6 +173,7 @@ public class VisaoGeralController {
         }
     }
 
+    // Método para mostrar alertas
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);

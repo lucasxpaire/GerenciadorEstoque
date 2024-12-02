@@ -14,17 +14,17 @@ public class PainelController {
 
     @FXML
     public void goToVisaoGeral(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-prop/visao-geral.fxml", "Visão Geral do Dono", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/visao-geral.fxml", "Visão Geral", event);
     }
 
     @FXML
     public void goToRelatorios(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-prop/relatorios.fxml", "Relatórios Detalhados", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/relatorios.fxml", "Relatórios", event);
     }
 
     @FXML
     public void goToManterFuncionarios(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/painel-prop/manter-funcionarios.fxml", "Configuração de Funcionários", event);
+        carregarTela("/com/gerencia/estoque/painel-prop/manter-funcionarios.fxml", "Funcionários", event);
     }
     @FXML
     public void goToManterEstoque(ActionEvent event) {
@@ -32,7 +32,7 @@ public class PainelController {
     }
     @FXML
     public void goToTransacao(ActionEvent event) {
-        carregarTela("/com/gerencia/estoque/transacao/transacao.fxml", "Vender Produto", event);
+        carregarTela("/com/gerencia/estoque/transacao/transacao.fxml", "Transacao", event);
     }
 
     @FXML
@@ -43,6 +43,11 @@ public class PainelController {
     @FXML
     public void goToClientes(ActionEvent event){
         carregarTela("/com/gerencia/estoque/painel-prop/manter-clientes.fxml", "Clientes", event);
+    }
+
+    @FXML
+    public void gotToAjuda(ActionEvent event){
+        carregarTela("/com/gerencia/estoque/painel-prop/ajudaproprietário.fxml", "Ajuda", event);
     }
 
 

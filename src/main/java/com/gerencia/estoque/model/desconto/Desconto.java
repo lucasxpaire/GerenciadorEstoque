@@ -28,63 +28,33 @@ public class Desconto {
     }
 
     // Getters e Setters
-    public int getIdDesconto() {
-        return idDesconto.get();
-    }
+    public int getIdDesconto() {return idDesconto.get();}
 
-    public void setIdDesconto(int idDesconto) {
-        this.idDesconto.set(idDesconto);
-    }
+    public void setIdDesconto(int idDesconto) {this.idDesconto.set(idDesconto);}
 
-    public IntegerProperty idDescontoProperty() {
-        return idDesconto;
-    }
+    public IntegerProperty idDescontoProperty() {return idDesconto;}
 
-    public String getTipo() {
-        return tipo.get();
-    }
+    public String getTipo() {return tipo.get();}
 
-    public void setTipo(String tipo) {
-        this.tipo.set(tipo);
-    }
+    public void setTipo(String tipo) {this.tipo.set(tipo);}
 
-    public StringProperty tipoProperty() {
-        return tipo;
-    }
+    public StringProperty tipoProperty() {return tipo;}
 
-    public double getPercentual() {
-        return percentual.get();
-    }
+    public double getPercentual() {return percentual.get();}
 
-    public void setPercentual(double percentual) {
-        this.percentual.set(percentual);
-    }
+    public void setPercentual(double percentual) {this.percentual.set(percentual);}
 
-    public DoubleProperty percentualProperty() {
-        return percentual;
-    }
+    public DoubleProperty percentualProperty() {return percentual;}
 
-    public String getDescricao() {
-        return descricao.get();
-    }
+    public String getDescricao() {return descricao.get();}
 
-    public void setDescricao(String descricao) {
-        this.descricao.set(descricao);
-    }
+    public void setDescricao(String descricao) {this.descricao.set(descricao);}
 
-    public StringProperty descricaoProperty() {
-        return descricao;
-    }
+    public StringProperty descricaoProperty() {return descricao;}
 
-    public int getPontosMinimos() {
-        return pontosMinimos.get();
-    }
+    public int getPontosMinimos() {return pontosMinimos.get();}
 
-    public void setPontosMinimos(int pontosMinimos) {
-        this.pontosMinimos.set(pontosMinimos);
-    }
+    public void setPontosMinimos(int pontosMinimos) {this.pontosMinimos.set(pontosMinimos);}
 
-    public IntegerProperty pontosMinimosProperty() {
-        return pontosMinimos;
-    }
+    public IntegerProperty pontosMinimosProperty() {return pontosMinimos;}
 }
