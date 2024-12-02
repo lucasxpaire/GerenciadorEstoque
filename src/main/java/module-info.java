@@ -3,6 +3,9 @@ module com.gerencia.estoque {
     requires javafx.fxml;
     requires javafx.graphics;
     requires java.sql;
+    requires itextpdf;
+    requires kernel;
+    requires layout;
 
     // Pacote principal
     exports com.gerencia.estoque;

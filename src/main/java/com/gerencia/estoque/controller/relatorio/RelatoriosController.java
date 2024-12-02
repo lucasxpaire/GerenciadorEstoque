@@ -2,6 +2,18 @@ package com.gerencia.estoque.controller.relatorio;
 
 import com.gerencia.estoque.dao.Database;
 import com.gerencia.estoque.model.relatorio.*;
+
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,18 +22,29 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Cell;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+//import com.itextpdf.kernel.pdf.PdfWriter;
+//import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Table;
+//import com.itextpdf.layout.element.Cell;
+import com.itextpdf.kernel.pdf.PdfDocument;
+
+import java.io.FileOutputStream;
 
 public class RelatoriosController {
     @FXML private TableView<RelatorioTransacoes> tabelaVendas;
@@ -421,4 +444,154 @@ public class RelatoriosController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void gerarPdfVendas(ActionEvent event){
+        exportarTabelaParaPDF(tabelaVendas, "Relatório de Vendas", "relatorio_vendas.pdf");
+    }
+    @FXML
+    private void gerarPdfCompras(ActionEvent event){
+        exportarTabelaParaPDF(tabelaCompra, "Relatório de Compras", "relatorio_compras.pdf");
+    }
+    @FXML
+    private void gerarPdfDemandas(ActionEvent event){
+        exportarTabelaParaPDF(tabelaDemanda, "Relatório de Demandas", "relatorio_demandas.pdf");
+    }
+    @FXML
+    private void gerarPdfDescontos(ActionEvent event){
+        exportarTabelaParaPDF(tabelaDescontos, "Relatório de Descontos", "relatorio_descontos.pdf");
+    }
+    @FXML
+    private void gerarPdfProdutosVendidos(ActionEvent event){
+        exportarTabelaParaPDF(tabelaProdutosMaisVendidos, "Relatório de Produtos mais Vendidos", "relatorio_produtosmaisvendidos.pdf");
+    }
+    @FXML
+    private void gerarPdfProdutosComprados(ActionEvent event){
+        exportarTabelaParaPDF(tabelaCompra, "Relatório de Produtos mais Comprados", "relatorio_produtosmaiscomprados.pdf");
+    }
+
+    private <T> void exportarTabelaParaPDF(TableView<T> tabela, String tituloPDF, String nomeArquivo) {
+        try {
+            // Caminho base para salvar os PDFs
+            URL recurso = getClass().getClassLoader().getResource("com/gerencia/estoque/pdf");
+
+            if (recurso == null) {
+                // Se não encontrar o recurso, usamos a pasta 'pdf' no sistema de arquivos local
+                String diretorioBase = "src/main/resources/com/gerencia/estoque/pdf"; // Caminho local no ambiente de desenvolvimento
+                File diretorio = new File(diretorioBase);
+                if (!diretorio.exists()) {
+                    diretorio.mkdirs(); // Cria o diretório se não existir
+                }
+                String caminhoArquivo = diretorioBase + "/" + nomeArquivo;
+                // Criação do documento PDF
+                Document document = new Document();
+                PdfWriter.getInstance(document, new FileOutputStream(caminhoArquivo));
+                document.open();
+
+                // Adiciona o título do relatório
+                document.add(new Paragraph(tituloPDF));
+                document.add(new Paragraph(" ")); // Espaço em branco
+
+                // Criação da tabela PDF com o número de colunas igual ao da TableView
+                PdfPTable pdfTable = new PdfPTable(tabela.getColumns().size());
+                pdfTable.setWidthPercentage(100); // Largura da tabela ajustada
+
+                // Adiciona os cabeçalhos das colunas
+                for (TableColumn<?, ?> coluna : tabela.getColumns()) {
+                    pdfTable.addCell(coluna.getText());
+                }
+
+                // Adiciona os dados das células (itens)
+                for (T item : tabela.getItems()) {
+                    for (TableColumn<T, ?> coluna : tabela.getColumns()) {
+                        // Aqui, dependendo do tipo da coluna, obtemos o valor de forma segura
+                        Object valor = coluna.getCellData(item);
+                        String valorStr = "";
+
+                        // Tratamento de tipos comuns, adaptando conforme necessário para cada coluna
+                        if (valor != null) {
+                            if (valor instanceof StringProperty) {
+                                valorStr = ((StringProperty) valor).get();
+                            } else if (valor instanceof IntegerProperty) {
+                                valorStr = String.valueOf(((IntegerProperty) valor).get());
+                            } else {
+                                valorStr = valor.toString();
+                            }
+                        }
+
+                        // Adiciona a célula ao PDF com o valor convertido
+                        pdfTable.addCell(valorStr);
+                    }
+                }
+
+                // Adiciona a tabela ao documento PDF
+                document.add(pdfTable);
+                document.close();
+
+                // Exibe o caminho onde o PDF foi gerado
+                System.out.println("PDF gerado em: " + caminhoArquivo);
+            } else {
+                // Caso o recurso seja encontrado, utilizamos o URL
+                String diretorioBase = recurso.getPath();
+                File diretorio = new File(diretorioBase);
+                if (!diretorio.exists()) {
+                    diretorio.mkdirs(); // Cria o diretório se não existir
+                }
+                String caminhoArquivo = diretorioBase + "/" + nomeArquivo;
+
+                // Criação do documento PDF
+                Document document = new Document();
+                PdfWriter.getInstance(document, new FileOutputStream(caminhoArquivo));
+                document.open();
+
+                // Adiciona o título do relatório
+                document.add(new Paragraph(tituloPDF));
+                document.add(new Paragraph(" ")); // Espaço em branco
+
+                // Criação da tabela PDF com o número de colunas igual ao da TableView
+                PdfPTable pdfTable = new PdfPTable(tabela.getColumns().size());
+                pdfTable.setWidthPercentage(100); // Largura da tabela ajustada
+
+                // Adiciona os cabeçalhos das colunas
+                for (TableColumn<?, ?> coluna : tabela.getColumns()) {
+                    pdfTable.addCell(coluna.getText());
+                }
+
+                // Adiciona os dados das células (itens)
+                for (T item : tabela.getItems()) {
+                    for (TableColumn<T, ?> coluna : tabela.getColumns()) {
+                        // Aqui, dependendo do tipo da coluna, obtemos o valor de forma segura
+                        Object valor = coluna.getCellData(item);
+                        String valorStr = "";
+
+                        // Tratamento de tipos comuns, adaptando conforme necessário para cada coluna
+                        if (valor != null) {
+                            if (valor instanceof StringProperty) {
+                                valorStr = ((StringProperty) valor).get();
+                            } else if (valor instanceof IntegerProperty) {
+                                valorStr = String.valueOf(((IntegerProperty) valor).get());
+                            } else {
+                                valorStr = valor.toString();
+                            }
+                        }
+
+                        // Adiciona a célula ao PDF com o valor convertido
+                        pdfTable.addCell(valorStr);
+                    }
+                }
+
+                // Adiciona a tabela ao documento PDF
+                document.add(pdfTable);
+                document.close();
+
+                // Exibe o caminho onde o PDF foi gerado
+                System.out.println("PDF gerado em: " + caminhoArquivo);
+            }
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

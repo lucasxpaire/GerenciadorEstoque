@@ -7,9 +7,10 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.relatorio.RelatoriosController">
+<BorderPane prefHeight="1001.0" prefWidth="561.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gerencia.estoque.controller.relatorio.RelatoriosController">
     <top>
         <Label alignment="CENTER" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10;" text="Relatórios" />
     </top>
@@ -17,7 +18,7 @@
         <TabPane>
             <!-- Relatório de Transações -->
             <Tab text="Transações">
-                <VBox spacing="10" style="-fx-padding: 10;" alignment="CENTER">
+                <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
                     <!-- Tabela de Transações Vendas -->
                     <Label alignment="CENTER" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Transações de Vendas" />
                     <TableView fx:id="tabelaVendas" prefHeight="322.0" prefWidth="390.0">
@@ -47,15 +48,21 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
-
-                    <!-- Botão Voltar -->
-                    <Button fx:id="btnVoltarTransacoes" alignment="CENTER" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" onAction="#voltar" />
+               <HBox alignment="CENTER" prefHeight="20.0" prefWidth="311.0" spacing="20.0">
+                  <children>
+                          <Button onAction="#gerarPdfCompras" text="Gerar PDF de Compras" />
+      
+                          <!-- Botão Voltar -->
+                          <Button fx:id="btnVoltarTransacoes" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
+                          <Button onAction="#gerarPdfVendas" text="Gerar PDF de Vendas" />
+                  </children>
+               </HBox>
                 </VBox>
             </Tab>
 
             <!-- Relatório de Demanda -->
             <Tab text="Demandas">
-                <VBox spacing="10" style="-fx-padding: 10;" alignment="CENTER">
+                <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
                     <!-- Tabela de Demanda -->
                     <Label alignment="CENTER" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Produtos Demandados" />
                     <TableView fx:id="tabelaDemanda">
@@ -81,15 +88,20 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
-
-                    <!-- Botão Voltar -->
-                    <Button fx:id="btnVoltarDemandas" alignment="CENTER" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" onAction="#voltar" />
+               <HBox alignment="CENTER" prefHeight="25.0" prefWidth="219.0" spacing="20.0">
+                  <children>
+      
+                          <!-- Botão Voltar -->
+                          <Button fx:id="btnVoltarDemandas" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
+                          <Button onAction="#gerarPdfDemandas" text="Gerar PDF de Demandas" />
+                  </children>
+               </HBox>
                 </VBox>
             </Tab>
 
             <!-- Relatório de Descontos Aplicados -->
             <Tab text="Descontos Aplicados">
-                <VBox spacing="10" style="-fx-padding: 10;" alignment="CENTER">
+                <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
                     <!-- Tabela de Descontos Aplicados -->
                     <Label alignment="CENTER" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Descontos" />
                     <TableView fx:id="tabelaDescontos">
@@ -114,15 +126,20 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
-
-                    <!-- Botão Voltar -->
-                    <Button fx:id="btnVoltarDescontos" alignment="CENTER" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" onAction="#voltar" />
+               <HBox alignment="TOP_CENTER" prefHeight="16.0" prefWidth="357.0" spacing="20.0">
+                  <children>
+      
+                          <!-- Botão Voltar -->
+                          <Button fx:id="btnVoltarDescontos" alignment="CENTER" onAction="#voltar" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
+                          <Button alignment="CENTER" onAction="#gerarPdfDescontos" text="Gerar PDF de Descontos" />
+                  </children>
+               </HBox>
                 </VBox>
             </Tab>
 
             <!-- Relatório de Métricas -->
             <Tab text="Compras e Vendas">
-                <VBox spacing="10" style="-fx-padding: 10;" alignment="CENTER">
+                <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
                     <!-- Produtos Mais Vendidos -->
                     <Label alignment="CENTER" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Produtos Mais Vendidos" />
                     <TableView fx:id="tabelaProdutosMaisVendidos">
@@ -148,9 +165,15 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
-
-                    <!-- Botão Voltar -->
-                    <Button fx:id="btnVoltarMetricas" alignment="CENTER" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" onAction="#voltar" />
+               <HBox alignment="CENTER" prefHeight="11.0" prefWidth="356.0" spacing="20.0">
+                  <children>
+                          <Button onAction="#gerarPdfProdutosVendidos" prefHeight="25.0" prefWidth="202.0" text="Gerar PDF de Produtos Vendidos" />
+      
+                          <!-- Botão Voltar -->
+                          <Button fx:id="btnVoltarMetricas" alignment="CENTER" onAction="#voltar" prefHeight="25.0" prefWidth="84.0" style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Voltar" />
+                          <Button onAction="#gerarPdfProdutosComprados" prefHeight="25.0" prefWidth="213.0" text="Gerar PDF de Produtos Comprados" />
+                  </children>
+               </HBox>
                 </VBox>
             </Tab>
 
