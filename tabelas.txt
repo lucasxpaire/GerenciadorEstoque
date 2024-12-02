@@ -1,0 +1,88 @@
+-- Tabela Credenciais
+CREATE TABLE Credenciais (
+    IdCredencial SERIAL PRIMARY KEY,
+    Usuario VARCHAR(50) UNIQUE NOT NULL,
+    Senha VARCHAR(255) NOT NULL,
+    Tipo VARCHAR(20) NOT NULL -- Ex: 'proprietário', 'funcionário'
+);
+
+-- Tabela Funcionario
+CREATE TABLE Funcionario (
+    IdFuncionario SERIAL PRIMARY KEY,
+    IdCredencial INT NOT NULL,
+    Nome VARCHAR(100) NOT NULL,
+    FOREIGN KEY (IdCredencial) REFERENCES Credenciais(IdCredencial)
+);
+
+-- Tabela Produto
+CREATE TABLE Produto (
+    IdProduto SERIAL PRIMARY KEY,
+    Preco NUMERIC(10, 2) NOT NULL, -- Preço com até 2 casas decimais
+    Descricao VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE Estoque (
+    IdProduto SERIAL PRIMARY KEY,
+	Preco NUMERIC(10,2) NOT NULL,
+    Descricao VARCHAR(200) NOT NULL,
+    Quantidade INT NOT NULL CHECK (Quantidade >=0),
+	FOREIGN KEY (IdProduto) REFERENCES Produto(IdProduto)
+);
+
+-- tabela Transacao
+CREATE TABLE Transacao (
+    IdTransacao SERIAL PRIMARY KEY,
+    IdProduto INT NOT NULL,
+    IdFuncionario INT NOT NULL,
+    IdCliente INT, -- Novo campo para vincular transações a clientes 
+    Preco NUMERIC(10, 2) NOT NULL,
+    Descricao VARCHAR(200) NOT NULL,
+    Quantidade INT NOT NULL CHECK (Quantidade > 0),
+    DataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    Tipo VARCHAR(20) NOT NULL, -- Ex: 'compra', 'venda'
+    FOREIGN KEY (IdProduto) REFERENCES Produto(IdProduto),
+    FOREIGN KEY (IdFuncionario) REFERENCES Funcionario(IdFuncionario),
+    FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente) -- Nova chave estrangeira
+    IdDesconto INT,
+    FOREIGN KEY (IdDesconto) REFERENCES Desconto(IdDesconto);
+);
+
+-- Tabela ItemDemandado
+CREATE TABLE ItemDemandado (
+    IdItem SERIAL PRIMARY KEY,
+    Descricao VARCHAR(200) NOT NULL
+);
+
+-- Tabela Demanda
+CREATE TABLE Demanda (
+    IdItem INT NOT NULL,
+    IdCliente INT NOT NULL, -- Exemplo: pode ser uma referência futura para uma tabela de clientes
+    Contagem INT DEFAULT 1;
+    DataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (IdItem, IdCliente),
+    FOREIGN KEY (IdItem) REFERENCES ItemDemandado(IdItem)
+);
+
+-- Tabela Cliente
+CREATE TABLE Cliente (
+    IdCliente SERIAL PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL,
+    CPF CHAR(11) UNIQUE NOT NULL -- CPF com exatamente 11 caracteres, formato sem pontuação
+);
+
+-- Tabela Fidelidade (para gerenciar pontos e descontos futuros)
+CREATE TABLE Fidelidade (
+    IdCliente INT PRIMARY KEY,
+    Pontos INT DEFAULT 0 NOT NULL CHECK (Pontos >= 0), -- Pontos de fidelidade acumulados
+    DescontoUltimaCompra NUMERIC(5, 2) DEFAULT 0 CHECK (DescontoUltimaCompra >= 0), -- Percentual do desconto aplicado na última compra
+    FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente)
+);
+
+-- Tabela Desconto (para diferentes tipos de descontos)
+CREATE TABLE Desconto (
+    IdDesconto SERIAL PRIMARY KEY,
+    Tipo VARCHAR(50) NOT NULL, -- Ex: 'primeiracompra', 'fidelidade', etc.
+    Percentual NUMERIC(5, 2) NOT NULL CHECK (Percentual > 0), -- Percentual do desconto (0-100)
+    Descricao VARCHAR(200) -- Explicação adicional sobre o desconto
+    PontosMinimos INT DEFAULT 0;
+);
